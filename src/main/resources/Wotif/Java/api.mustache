@@ -1,0 +1,57 @@
+package {{package}};
+
+import {{invokerPackage}}.ApiException;
+import feign.Feign;
+import feign.RequestLine;
+import feign.jackson.JacksonDecoder;
+import javax.inject.Named;
+{{#imports}}import {{import}};
+{{/imports}}
+
+import java.util.*;
+
+{{#operations}}
+interface {{classname}}Proxy {
+  {{#operation}}
+  @RequestLine("GET {{path}}")
+  {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}Object {{/returnType}} {{nickname}}({{#allParams}}@Named("{{paramName}}") String {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
+  
+  {{/operation}}
+}
+
+public class {{classname}} {
+  String basePath;
+  {{classname}}Proxy feignProxy;
+
+  public {{className}} setBasePath(String basePath) {
+    this.basePath = basePath;
+    feignProxy = Feign.builder()
+                     .decoder(new JacksonDecoder())
+                     .target({{classname}}Proxy.class, basePath);
+    return this;
+  }
+  
+  public String getBasePath() {
+    return basePath;
+  }
+
+  {{#operation}}
+  public {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}Object {{/returnType}} {{nickname}} ({{#allParams}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
+    throws ApiException, RuntimeException {
+    {{#requiredParamCount}}
+    // verify required params are set
+    if({{/requiredParamCount}}{{#requiredParams}} {{paramName}} == null {{#hasMore}}|| {{/hasMore}}{{/requiredParams}}{{#requiredParamCount}}) {
+       throw new ApiException(400, "missing required params");
+    }
+    {{/requiredParamCount}}
+
+    if(basePath == null) {
+      throw new RuntimeException("Base Path is null! Please set Base Path for Green-Edge Service before using client.");
+    }
+    
+    return feignProxy.{{nickname}}({{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
+  }
+
+  {{/operation}}
+}
+{{/operations}}

@@ -1,0 +1,7 @@
+Swagger Codegen - see ORIGINAL_README.md for details.
+
+This version includes Wotif-specific code to generate a swagger client for the Green-Edge Service.
+
+Example Usage:
+
+./bin/runscala.sh com.wotif.swagger.codegen.WotifJavaGenerator http://localhost:23180/service/api-docs/platform/web blah greenedge
