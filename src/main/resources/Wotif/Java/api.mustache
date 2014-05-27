@@ -1,3 +1,9 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// This file was generated using Swagger Codegen, specialised for Wotif.com
+//
+////////////////////////////////////////////////////////////////////////////////
+
 package {{package}};
 
 import {{invokerPackage}}.ApiException;
@@ -8,9 +14,10 @@ import javax.inject.Named;
 {{#imports}}import {{import}};
 {{/imports}}
 
-import java.util.*;
-
 {{#operations}}
+/**
+ * Feign Proxy
+ */
 interface {{classname}}Proxy {
   {{#operation}}
   @RequestLine("GET {{path}}")
@@ -19,11 +26,32 @@ interface {{classname}}Proxy {
   {{/operation}}
 }
 
+/**
+ * Green-Edge {{classname}} Client
+ * generated using Swagger-Codegen
+ */
 public class {{classname}} {
   String basePath;
   {{classname}}Proxy feignProxy;
 
-  public {{className}} setBasePath(String basePath) {
+  //private constructor to ensure {{classname}} can't be instantiated without basePath  
+  private {{classname}}() {}
+
+  /**
+   * @param String - the base URL path for the service
+   */
+  public {{classname}}(String basePath) {
+      if(basePath == null) {
+          throw new IllegalArgumentException("Base Path is null! Base Path for Green-Edge Service must be set before using client.");
+      }
+      setBasePath(basePath);
+  }
+
+  /**
+   * Sets the base URL path for the service
+   * @param String basePath
+   */
+ public {{className}} setBasePath(String basePath) {
     this.basePath = basePath;
     feignProxy = Feign.builder()
                      .decoder(new JacksonDecoder())
@@ -31,23 +59,22 @@ public class {{classname}} {
     return this;
   }
   
+  /**
+   * Gets the base URL path for the service
+   * @return String
+   */
   public String getBasePath() {
     return basePath;
   }
 
   {{#operation}}
-  public {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}Object {{/returnType}} {{nickname}} ({{#allParams}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
-    throws ApiException, RuntimeException {
+  public {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}Object {{/returnType}} {{nickname}} ({{#allParams}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) throws ApiException {
     {{#requiredParamCount}}
     // verify required params are set
     if({{/requiredParamCount}}{{#requiredParams}} {{paramName}} == null {{#hasMore}}|| {{/hasMore}}{{/requiredParams}}{{#requiredParamCount}}) {
        throw new ApiException(400, "missing required params");
     }
     {{/requiredParamCount}}
-
-    if(basePath == null) {
-      throw new RuntimeException("Base Path is null! Please set Base Path for Green-Edge Service before using client.");
-    }
     
     return feignProxy.{{nickname}}({{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
   }

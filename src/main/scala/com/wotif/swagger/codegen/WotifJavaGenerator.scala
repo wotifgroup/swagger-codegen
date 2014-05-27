@@ -13,9 +13,9 @@ object WotifJavaGenerator extends BasicJavaGenerator {
       throw new RuntimeException("Need to specify target API name")
     }
     val packageName = args(2)
-    invokerPackageOverride = "com." + packageName + ".client"
-    modelPackageOverride = "com." + packageName + ".client.model"
-    apiPackageOverride = "com." + packageName + ".client.api"
+    invokerPackageOverride = "com.wotif." + packageName + ".client"
+    modelPackageOverride = "com.wotif." + packageName + ".client.model"
+    apiPackageOverride = "com.wotif." + packageName + ".client.api"
     generateClient(args)
   }
 
@@ -44,7 +44,6 @@ object WotifJavaGenerator extends BasicJavaGenerator {
    // supporting classes
   override def supportingFiles =
     List(
-      ("JsonUtil.mustache", destinationDir + java.io.File.separator + invokerPackage.get.replace(".", java.io.File.separator) + java.io.File.separator, "JsonUtil.java"),
       ("apiException.mustache", destinationDir + java.io.File.separator + invokerPackage.get.replace(".", java.io.File.separator) + java.io.File.separator, "ApiException.java"),
       ("pom.mustache", "generated-code/java", "pom.xml"))
 }
