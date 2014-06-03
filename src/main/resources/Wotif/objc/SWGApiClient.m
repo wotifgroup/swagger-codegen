@@ -6,7 +6,7 @@
 @implementation SWGApiClient
 
 static long requestId = 0;
-static bool offlineState = true;
+static bool offlineState = false;
 static NSMutableSet * queuedRequests = nil;
 static bool cacheEnabled = false;
 static AFNetworkReachabilityStatus reachabilityStatus = AFNetworkReachabilityStatusNotReachable;
@@ -198,25 +198,25 @@ static bool loggingEnabled = false;
 
 -(NSString*) pathWithQueryParamsToString:(NSString*) path
                              queryParams:(NSDictionary*) queryParams {
-    NSString * separator = nil;
-    int counter = 0;
-
     NSMutableString * requestUrl = [NSMutableString stringWithFormat:@"%@", path];
     if(queryParams != nil){
-        for(NSString * key in [queryParams keyEnumerator]){
-            if(counter == 0) separator = @"?";
-            else separator = @"&";
-            NSString * value;
-            if([[queryParams valueForKey:key] isKindOfClass:[NSString class]]){
-                value = [SWGApiClient escape:[queryParams valueForKey:key]];
+        __block NSMutableArray *params = [[NSMutableArray alloc] init];
+        [queryParams enumerateKeysAndObjectsUsingBlock:^(NSString *key, id value, BOOL *keyStop) {
+            NSString *escapedKey = [SWGApiClient escape:key];
+            if ([value isKindOfClass:[NSString class]]) {
+                [params addObject:[NSString stringWithFormat:@"%@=%@", escapedKey, [SWGApiClient escape:value]]];
+            } else if ([value isKindOfClass:[NSArray class]]) {
+                [value enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *arrayStop) {
+                    if ([obj isKindOfClass:[NSString class]]) {
+                        [params addObject:[NSString stringWithFormat:@"%@=%@", escapedKey, [SWGApiClient escape:obj]]];
+                    }
+                }];
+            } else {
+                [params addObject:[NSString stringWithFormat:@"%@=%@", escapedKey, value]];
             }
-            else {
-                value = [NSString stringWithFormat:@"%@", [queryParams valueForKey:key]];
-            }
-            [requestUrl appendString:[NSString stringWithFormat:@"%@%@=%@", separator,
-                                      [SWGApiClient escape:key], value]];
-            counter += 1;
-        }
+        }];
+        
+        [requestUrl appendString:[NSString stringWithFormat:@"?%@", [params componentsJoinedByString:@"&"]]];
     }
     return requestUrl;
 }
