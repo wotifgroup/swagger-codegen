@@ -30,13 +30,13 @@ static bool loggingEnabled = false;
                                       diskSize:(unsigned long) diskSize {
     NSAssert(memorySize > 0, @"invalid in-memory cache size");
     NSAssert(diskSize >= 0, @"invalid disk cache size");
-
+    
     NSURLCache *cache =
     [[NSURLCache alloc]
      initWithMemoryCapacity:memorySize
      diskCapacity:diskSize
      diskPath:@"swagger_url_cache"];
-
+    
     [NSURLCache setSharedURLCache:cache];
 }
 
@@ -53,17 +53,17 @@ static bool loggingEnabled = false;
         // setup static vars
         // create queue
         sharedQueue = [[NSOperationQueue alloc] init];
-
+        
         // create pool
         _pool = [[NSMutableDictionary alloc] init];
-
+        
         // initialize URL cache
         [SWGApiClient configureCacheWithMemoryAndDiskCapacity:4*1024*1024 diskSize:32*1024*1024];
-
+        
         // configure reachability
         [SWGApiClient configureCacheReachibilityForHost:baseUrl];
     }
-
+    
     @synchronized(self) {
         SWGApiClient * client = [_pool objectForKey:baseUrl];
         if (client == nil) {
@@ -97,11 +97,11 @@ static bool loggingEnabled = false;
 }
 
 +(NSNumber*) queueRequest {
-    NSNumber* requestId = [SWGApiClient nextRequestId];
+    NSNumber* nextRequestId = [SWGApiClient nextRequestId];
     if(loggingEnabled)
-        NSLog(@"added %@ to request queue", requestId);
-    [queuedRequests addObject:requestId];
-    return requestId;
+        NSLog(@"added %@ to request queue", nextRequestId);
+    [queuedRequests addObject:nextRequestId];
+    return nextRequestId;
 }
 
 +(void) cancelRequest:(NSNumber*)requestId {
@@ -129,7 +129,7 @@ static bool loggingEnabled = false;
             return TRUE;
         else return FALSE;
     }];
-
+    
     if(matchingItems.count == 1) {
         if(loggingEnabled)
             NSLog(@"removing request id %@", requestId);
@@ -168,25 +168,23 @@ static bool loggingEnabled = false;
                     NSLog(@"reachability changed to AFNetworkReachabilityStatusUnknown");
                 [SWGApiClient setOfflineState:true];
                 break;
-
+                
             case AFNetworkReachabilityStatusNotReachable:
                 if(loggingEnabled)
                     NSLog(@"reachability changed to AFNetworkReachabilityStatusNotReachable");
                 [SWGApiClient setOfflineState:true];
                 break;
-
+                
             case AFNetworkReachabilityStatusReachableViaWWAN:
                 if(loggingEnabled)
                     NSLog(@"reachability changed to AFNetworkReachabilityStatusReachableViaWWAN");
                 [SWGApiClient setOfflineState:false];
                 break;
-
+                
             case AFNetworkReachabilityStatusReachableViaWiFi:
                 if(loggingEnabled)
                     NSLog(@"reachability changed to AFNetworkReachabilityStatusReachableViaWiFi");
                 [SWGApiClient setOfflineState:false];
-                break;
-            default:
                 break;
         }
         // call the reachability block, if configured
@@ -242,12 +240,12 @@ static bool loggingEnabled = false;
       requestContentType:(NSString*) requestContentType
      responseContentType:(NSString*) responseContentType
          completionBlock:(void (^)(NSDictionary*, NSError *))completionBlock {
-
+    
     NSMutableURLRequest * request = nil;
-
+    
     if ([body isKindOfClass:[SWGFile class]]){
         SWGFile * file = (SWGFile*) body;
-
+        
         request = [self multipartFormRequestWithMethod:@"POST"
                                                   path:path
                                             parameters:nil
@@ -278,7 +276,7 @@ static bool loggingEnabled = false;
         NSLog(@"%@ cache disabled", path);
         [request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
     }
-
+    
     if(body != nil) {
         if([body isKindOfClass:[NSDictionary class]] || [body isKindOfClass:[NSArray class]]){
             [request setValue:requestContentType forHTTPHeaderField:@"Content-Type"];
@@ -294,36 +292,36 @@ static bool loggingEnabled = false;
         }
     }
     [request setValue:[headerParams valueForKey:responseContentType] forHTTPHeaderField:@"Accept"];
-
+    
     // Always disable cookies!
     [request setHTTPShouldHandleCookies:NO];
-
-
+    
+    
     if (self.logRequests) {
         [self logRequest:request];
     }
-
-    NSNumber* requestId = [SWGApiClient queueRequest];
+    
+    NSNumber* queueRequestId = [SWGApiClient queueRequest];
     AFJSONRequestOperation *op =
     [AFJSONRequestOperation
      JSONRequestOperationWithRequest:request
-     success:^(NSURLRequest *request, NSHTTPURLResponse *response, id JSON) {
-         if([self executeRequestWithId:requestId]) {
+     success:^(NSURLRequest *req, NSHTTPURLResponse *response, id JSON) {
+         if([self executeRequestWithId:queueRequestId]) {
              if(self.logServerResponses)
-                 [self logResponse:JSON forRequest:request error:nil];
+                 [self logResponse:JSON forRequest:req error:nil];
              completionBlock(JSON, nil);
          }
-     } failure:^(NSURLRequest *request, NSHTTPURLResponse *response, NSError *error, id data) {
-         if([self executeRequestWithId:requestId]) {
+     } failure:^(NSURLRequest *req, NSHTTPURLResponse *response, NSError *error, id data) {
+         if([self executeRequestWithId:queueRequestId]) {
              if(self.logServerResponses)
-                 [self logResponse:nil forRequest:request error:error];
+                 [self logResponse:nil forRequest:req error:error];
              completionBlock(nil, error);
          }
      }
      ];
-
+    
     [self enqueueHTTPRequestOperation:op];
-    return requestId;
+    return queueRequestId;
 }
 
 -(NSNumber*)  stringWithCompletionBlock:(NSString*) path
@@ -336,12 +334,12 @@ static bool loggingEnabled = false;
                         completionBlock:(void (^)(NSString*, NSError *))completionBlock {
     AFHTTPClient *client = self;
     client.parameterEncoding = AFJSONParameterEncoding;
-
+    
     NSMutableURLRequest * request = nil;
-
+    
     if ([body isKindOfClass:[SWGFile class]]){
         SWGFile * file = (SWGFile*) body;
-
+        
         request = [self multipartFormRequestWithMethod:@"POST"
                                                   path:path
                                             parameters:nil
@@ -357,7 +355,7 @@ static bool loggingEnabled = false;
                                      path:[self pathWithQueryParamsToString:path queryParams:queryParams]
                                parameters:body];
     }
-
+    
     BOOL hasHeaderParams = false;
     if(headerParams != nil && [headerParams count] > 0)
         hasHeaderParams = true;
@@ -373,7 +371,7 @@ static bool loggingEnabled = false;
         NSLog(@"%@ cache disabled", path);
         [request setCachePolicy:NSURLRequestReloadIgnoringLocalCacheData];
     }
-
+    
     if(body != nil) {
         if([body isKindOfClass:[NSDictionary class]]){
             [request setValue:requestContentType forHTTPHeaderField:@"Content-Type"];
@@ -389,31 +387,31 @@ static bool loggingEnabled = false;
         }
     }
     [request setValue:[headerParams valueForKey:responseContentType] forHTTPHeaderField:@"Accept"];
-
+    
     // Always disable cookies!
     [request setHTTPShouldHandleCookies:NO];
-
-    NSNumber* requestId = [SWGApiClient queueRequest];
+    
+    NSNumber* queueRequestId = [SWGApiClient queueRequest];
     AFHTTPRequestOperation *op = [[AFHTTPRequestOperation alloc] initWithRequest:request];
     [op setCompletionBlockWithSuccess:
      ^(AFHTTPRequestOperation *resp,
        id responseObject) {
          NSString *response = [resp responseString];
-         if([self executeRequestWithId:requestId]) {
+         if([self executeRequestWithId:queueRequestId]) {
              if(self.logServerResponses)
                  [self logResponse:responseObject forRequest:request error:nil];
              completionBlock(response, nil);
          }
      } failure:^(AFHTTPRequestOperation *operation, NSError *error) {
-         if([self executeRequestWithId:requestId]) {
+         if([self executeRequestWithId:queueRequestId]) {
              if(self.logServerResponses)
                  [self logResponse:nil forRequest:request error:error];
              completionBlock(nil, error);
          }
      }];
-
+    
     [self enqueueHTTPRequestOperation:op];
-    return requestId;
+    return queueRequestId;
 }
 
 @end
