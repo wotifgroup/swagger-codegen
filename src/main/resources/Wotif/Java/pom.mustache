@@ -7,9 +7,9 @@
   <name>{{artifactId}}</name>
   <version>{{artifactVersion}}</version>
   <scm>
-    <connection>scm:git:git@github.com:wordnik/swagger-mustache.git</connection>
-    <developerConnection>scm:git:git@github.com:wordnik/swagger-codegen.git</developerConnection>
-    <url>https://github.com/wordnik/swagger-codegen</url>
+    <connection>scm:git:git@wothub.core.wotifgroup.com:aducrou/swagger-codegen.git</connection>
+    <developerConnection>scm:git:git@wothub.core.wotifgroup.com:aducrou/swagger-codegen.git</developerConnection>
+    <url>https://wothub.core.wotifgroup.com/aducrou/swagger-codegen</url>
   </scm>
   <prerequisites>
     <maven>2.2.0</maven>
@@ -81,18 +81,6 @@
               </sources>
             </configuration>
           </execution>
-          <execution>
-            <id>add_test_sources</id>
-            <phase>generate-test-sources</phase>
-            <goals>
-              <goal>add-test-source</goal>
-            </goals>
-            <configuration>
-              <sources>
-                <source>src/test/java</source>
-              </sources>
-            </configuration>
-          </execution>
         </executions>
       </plugin>
       <plugin>
@@ -112,7 +100,6 @@
           <execution>
             <goals>
               <goal>compile</goal>
-              <goal>testCompile</goal>
             </goals>
           </execution>
         </executions>
@@ -154,35 +141,6 @@
     </plugins>
   </reporting>
   <dependencies>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${jackson-version}</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
-      <version>${jackson-version}</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-      <version>${jackson-version}</version>
-      <scope>compile</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-joda</artifactId>
-      <version>2.1.5</version>
-    </dependency>   
-    <dependency>
-      <groupId>joda-time</groupId>
-      <artifactId>joda-time</artifactId>
-      <version>${jodatime-version}</version>
-      <scope>compile</scope>
-    </dependency>
 
     <dependency>
       <groupId>com.netflix.feign</groupId>
@@ -196,36 +154,10 @@
       <version>${feign-version}</version>
       <scope>compile</scope>
     </dependency>
-
-    <!-- test dependencies -->
-    <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-library</artifactId>
-      <version>${scala-version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.scalatest</groupId>
-      <artifactId>scalatest_2.9.1</artifactId>
-      <version>${scala-test-version}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${junit-version}</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
   <properties>
-    <jackson-version>2.1.4</jackson-version>
-    <jodatime-version>2.3</jodatime-version>
-    <scala-version>2.9.1-1</scala-version>
-    <junit-version>4.8.1</junit-version>
     <maven-plugin-version>1.0.0</maven-plugin-version>
-    <junit-version>4.8.1</junit-version>
-    <scala-test-version>1.6.1</scala-test-version>
     <scala-maven-plugin-version>3.1.5</scala-maven-plugin-version>
     <feign-version>6.1.2</feign-version>
   </properties>
