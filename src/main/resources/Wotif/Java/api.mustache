@@ -41,7 +41,7 @@ public class {{classname}} {
   private {{classname}}() {}
 
   /**
-   * @param String - the base URL path for the service
+   * @param basePath - the base URL path for the service
    */
   public {{classname}}(String basePath) {
       if(basePath == null) {
@@ -52,7 +52,7 @@ public class {{classname}} {
 
   /**
    * Sets the base URL path for the service
-   * @param String basePath
+   * @param basePath
    */
  public {{className}} setBasePath(String basePath) {
     this.basePath = basePath;
@@ -83,8 +83,7 @@ public class {{classname}} {
        throw new ApiException(400, "missing required params");
     }
     {{/requiredParamCount}}
-    
-    return feignProxy.{{nickname}}({{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
+      return feignProxy.{{nickname}}({{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
   }
 
   {{/operation}}
