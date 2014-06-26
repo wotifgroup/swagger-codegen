@@ -7,8 +7,9 @@
 package {{package}};
 
 import {{invokerPackage}}.ApiException;
-import feign.Feign;
+import feign.*;
 import feign.RequestLine;
+import feign.codec.Decoder;
 import feign.jackson.JacksonDecoder;
 import javax.inject.Named;
 {{#imports}}import {{import}};
@@ -35,6 +36,7 @@ interface {{classname}}Proxy {
 public class {{classname}} {
   private String basePath;
   private {{classname}}Proxy feignProxy;
+    private Decoder decoder;
 
   //private constructor to ensure {{classname}} can't be instantiated without basePath
   @SuppressWarnings("unused")
@@ -56,8 +58,9 @@ public class {{classname}} {
    */
  public {{className}} setBasePath(String basePath) {
     this.basePath = basePath;
+    this.decoder = new JacksonDecoder();
     feignProxy = Feign.builder()
-                     .decoder(new JacksonDecoder())
+                     .decoder(decoder)
                      .target({{classname}}Proxy.class, basePath);
     return this;
   }
