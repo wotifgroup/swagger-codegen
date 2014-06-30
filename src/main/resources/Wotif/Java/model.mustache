@@ -40,9 +40,9 @@ public class {{classname}} {
   @Override
   public String toString()  {
     StringBuilder sb = new StringBuilder();
-    sb.append("class {{classname}} {\n");
+    sb.append("{\n");
     {{#vars}}
-    sb.append("  {{name}}: ").append({{name}}).append("\n");
+    sb.append("\"{{name}}\":\"").append({{name}}).append("\"{{#hasMore}},{{/hasMore}}\n");
     {{/vars}}
     sb.append("}\n");
     return sb.toString();

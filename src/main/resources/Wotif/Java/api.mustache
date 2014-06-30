@@ -6,15 +6,21 @@
 
 package {{package}};
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import {{invokerPackage}}.ApiException;
 import feign.*;
 import feign.RequestLine;
 import feign.codec.Decoder;
+import feign.codec.EncodeException;
+import feign.codec.Encoder;
 import feign.jackson.JacksonDecoder;
 import javax.inject.Named;
 {{#imports}}import {{import}};
 {{/imports}}
-
+import java.io.IOException;
 import java.util.*;
 
 {{#operations}}
@@ -23,8 +29,13 @@ import java.util.*;
  */
 interface {{classname}}Proxy {
   {{#operation}}
-  @RequestLine("GET {{path}}")
-  {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}Object {{/returnType}} {{nickname}}({{#allParams}}@Named("{{paramName}}") {{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
+  @RequestLine("{{httpMethod}} {{path}}")
+  {{^get}}
+  {{#consumes}}
+  @Headers("Content-Type: {{mediaType}};charset=UTF-8")
+  {{/consumes}}
+  {{/get}}
+  Response {{nickname}}({{#allParams}}@Named("{{paramName}}") {{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
   
   {{/operation}}
 }
@@ -36,7 +47,8 @@ interface {{classname}}Proxy {
 public class {{classname}} {
   private String basePath;
   private {{classname}}Proxy feignProxy;
-    private Decoder decoder;
+  private Encoder encoder;
+  private Decoder decoder;
 
   //private constructor to ensure {{classname}} can't be instantiated without basePath
   @SuppressWarnings("unused")
@@ -59,7 +71,9 @@ public class {{classname}} {
  public {{className}} setBasePath(String basePath) {
     this.basePath = basePath;
     this.decoder = new JacksonDecoder();
+    this.encoder = new GreenEdgeEncoder();
     feignProxy = Feign.builder()
+                     .encoder(encoder)
                      .decoder(decoder)
                      .target({{classname}}Proxy.class, basePath);
     return this;
@@ -74,21 +88,58 @@ public class {{classname}} {
   }
 
   {{#operation}}
-  public {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}Object {{/returnType}} {{nickname}} ({{#allParams}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
-  {{^requiredParamCount}} 
-  { 
-  {{/requiredParamCount}}
-
+  public {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}Response {{/returnType}} {{nickname}} ({{#allParams}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
+  {{#returnType}} 
+  throws IOException
+  {{/returnType}}
   {{#requiredParamCount}}
-  throws ApiException {
+  throws ApiException
+  {{/requiredParamCount}}
+  {
+    {{#requiredParamCount}}
     // verify required params are set
     if({{/requiredParamCount}}{{#requiredParams}} {{paramName}} == null {{#hasMore}}|| {{/hasMore}}{{/requiredParams}}{{#requiredParamCount}}) {
        throw new ApiException(400, "missing required params");
     }
     {{/requiredParamCount}}
+    {{^returnType}}
       return feignProxy.{{nickname}}({{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
+    {{/returnType}}
+    {{#returnType}}
+      Response resp = feignProxy.{{nickname}}({{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
+      return {{returnType}}.class.cast(decoder.decode(resp, {{returnType}}.class));
+    {{/returnType}}
   }
 
   {{/operation}}
 }
 {{/operations}}
+
+/**
+ * GreenEdgeEncoder will encode the just the body of any posted request parameter named "body",
+ * in other cases it is equivalent to the feign JacksonEncoder.
+ */
+class GreenEdgeEncoder implements Encoder {
+
+    private final ObjectMapper mapper;
+
+    public GreenEdgeEncoder() {
+        mapper = new ObjectMapper()
+                 .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                 .configure(SerializationFeature.INDENT_OUTPUT, true);
+    }
+
+    @Override
+    public void encode(Object object, RequestTemplate template) throws EncodeException {
+        try {
+            Object body = ((LinkedHashMap)object).get("body");
+            if(body == null) {
+                template.body(mapper.writeValueAsString(object));
+            } else {
+                template.body(mapper.writeValueAsString(body));
+            }
+        } catch (JsonProcessingException e) {
+            throw new EncodeException(e.getMessage(), e);
+        }
+    }
+}
