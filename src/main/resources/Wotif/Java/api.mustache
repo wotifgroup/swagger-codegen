@@ -31,7 +31,7 @@ interface {{classname}}Proxy {
   @Headers("Content-Type: {{mediaType}};charset=UTF-8")
   {{/consumes}}
   {{/post}}
-  Response {{nickname}}({{#allParams}}@Named("{{paramName}}") {{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
+  {{#returnType}}{{returnType}} {{/returnType}}{{^returnType}}Object {{/returnType}}{{nickname}}({{#allParams}}@Named("{{paramName}}") {{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
   
   {{/operation}}
 }
@@ -84,7 +84,7 @@ public class {{classname}} {
   }
 
   {{#operation}}
-  public {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}Response {{/returnType}} {{nickname}} ({{#allParams}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
+  public {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}Object {{/returnType}} {{nickname}} ({{#allParams}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
   {{#returnType}} 
   throws IOException
   {{/returnType}}
@@ -98,13 +98,7 @@ public class {{classname}} {
        throw new ApiException(400, "missing required params");
     }
     {{/requiredParamCount}}
-    {{^returnType}}
-      return feignProxy.{{nickname}}({{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
-    {{/returnType}}
-    {{#returnType}}
-      Response resp = feignProxy.{{nickname}}({{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
-      return {{returnType}}.class.cast(decoder.decode(resp, {{returnType}}.class));
-    {{/returnType}}
+    return feignProxy.{{nickname}}({{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
   }
 
   {{/operation}}
