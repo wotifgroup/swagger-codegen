@@ -1,0 +1,45 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// This file was generated using Swagger Codegen, specialised for Wotif.com
+//
+////////////////////////////////////////////////////////////////////////////////
+
+package {{invokerPackage}};
+
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import feign.RequestTemplate;
+import feign.codec.EncodeException;
+import feign.codec.Encoder;
+
+import java.util.LinkedHashMap;
+
+/**
+ * PostBodyEncoder will encode the content of the body parameter of a posted request.
+ */
+public class PostBodyEncoder implements Encoder {
+
+    private final ObjectMapper mapper;
+
+    public PostBodyEncoder() {
+        mapper = new ObjectMapper()
+                 .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                 .configure(SerializationFeature.INDENT_OUTPUT, true);
+    }
+
+    @Override
+    public void encode(Object object, RequestTemplate template) throws EncodeException {
+        try {
+            Object body = ((LinkedHashMap)object).get("body");
+            if(body == null) {
+                template.body(mapper.writeValueAsString(object));
+            } else {
+                template.body(mapper.writeValueAsString(body));
+            }
+        } catch (JsonProcessingException e) {
+            throw new EncodeException(e.getMessage(), e);
+        }
+    }
+}

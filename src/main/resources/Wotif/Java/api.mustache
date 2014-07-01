@@ -6,22 +6,18 @@
 
 package {{package}};
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import {{invokerPackage}}.ApiException;
+import {{invokerPackage}}.PostBodyEncoder;
 import feign.*;
 import feign.RequestLine;
 import feign.codec.Decoder;
-import feign.codec.EncodeException;
 import feign.codec.Encoder;
 import feign.jackson.JacksonDecoder;
 import javax.inject.Named;
+
+import java.io.IOException;
 {{#imports}}import {{import}};
 {{/imports}}
-import java.io.IOException;
-import java.util.*;
 
 {{#operations}}
 /**
@@ -30,18 +26,18 @@ import java.util.*;
 interface {{classname}}Proxy {
   {{#operation}}
   @RequestLine("{{httpMethod}} {{path}}")
-  {{^get}}
+  {{#post}}
   {{#consumes}}
   @Headers("Content-Type: {{mediaType}};charset=UTF-8")
   {{/consumes}}
-  {{/get}}
+  {{/post}}
   Response {{nickname}}({{#allParams}}@Named("{{paramName}}") {{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
   
   {{/operation}}
 }
 
 /**
- * Green-Edge {{classname}} Client
+ * {{classname}} Client
  * generated using Swagger-Codegen
  */
 public class {{classname}} {
@@ -71,7 +67,7 @@ public class {{classname}} {
  public {{className}} setBasePath(String basePath) {
     this.basePath = basePath;
     this.decoder = new JacksonDecoder();
-    this.encoder = new GreenEdgeEncoder();
+    this.encoder = new PostBodyEncoder();
     feignProxy = Feign.builder()
                      .encoder(encoder)
                      .decoder(decoder)
@@ -114,32 +110,3 @@ public class {{classname}} {
   {{/operation}}
 }
 {{/operations}}
-
-/**
- * GreenEdgeEncoder will encode the just the body of any posted request parameter named "body",
- * in other cases it is equivalent to the feign JacksonEncoder.
- */
-class GreenEdgeEncoder implements Encoder {
-
-    private final ObjectMapper mapper;
-
-    public GreenEdgeEncoder() {
-        mapper = new ObjectMapper()
-                 .setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                 .configure(SerializationFeature.INDENT_OUTPUT, true);
-    }
-
-    @Override
-    public void encode(Object object, RequestTemplate template) throws EncodeException {
-        try {
-            Object body = ((LinkedHashMap)object).get("body");
-            if(body == null) {
-                template.body(mapper.writeValueAsString(object));
-            } else {
-                template.body(mapper.writeValueAsString(body));
-            }
-        } catch (JsonProcessingException e) {
-            throw new EncodeException(e.getMessage(), e);
-        }
-    }
-}
