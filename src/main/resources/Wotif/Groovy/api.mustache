@@ -1,0 +1,90 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// This file was generated using Swagger Codegen, specialised for Wotif.com
+//
+////////////////////////////////////////////////////////////////////////////////
+
+package {{package}}
+
+import {{invokerPackage}}.PostBodyEncoder
+import feign.*
+import feign.RequestLine
+import feign.codec.Decoder
+import feign.codec.Encoder
+import feign.jackson.JacksonDecoder
+import javax.inject.Named
+
+{{#imports}}import {{import}}
+{{/imports}}
+
+{{#operations}}
+/**
+ * Feign Proxy
+ */
+interface {{classname}}Proxy {
+  {{#operation}}
+  @RequestLine("{{httpMethod}} {{path}}")
+  {{#post}}
+  {{#consumes}}
+  @Headers("Content-Type: {{mediaType}};charset=UTF-8")
+  {{/consumes}}
+  {{/post}}
+  Response {{nickname}}({{#allParams}}@Named("{{paramName}}") {{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
+  
+  {{/operation}}
+}
+
+/**
+ * {{classname}} Client
+ * generated using Swagger-Codegen
+ */
+class {{classname}} {
+
+  String basePath
+  private {{classname}}Proxy feignProxy
+  private Encoder encoder
+  private Decoder decoder
+
+  /**
+   * Sets the base URL path for the service
+   * @param basePath
+   */
+ {{className}} setBasePath(String basePath) {
+    if(basePath == null) {
+        throw new IllegalArgumentException("Base Path is null! Base Path for Service must be set before using client.");
+    }
+    this.basePath = basePath
+    this.decoder = new JacksonDecoder()
+    this.encoder = new PostBodyEncoder()
+    feignProxy = Feign.builder()
+                     .encoder(encoder)
+                     .decoder(decoder)
+                     .target({{classname}}Proxy.class, basePath)
+    return this
+  }
+
+  {{#operation}}
+  def {{nickname}} ({{#allParams}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) {
+    {{#requiredParamCount}}
+    // verify required params are set
+    if({{/requiredParamCount}}{{#requiredParams}} {{paramName}} == null {{#hasMore}}|| {{/hasMore}}{{/requiredParams}}{{#requiredParamCount}}) {
+       "Missing required params"
+    }
+    {{/requiredParamCount}}
+    Response response = feignProxy.{{nickname}}({{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
+    {{#errorList}}
+    if(response.status() == {{code}}) {
+      return "{{reason}} - " + response.body().toString()
+    }
+    {{/errorList}}
+    {{#returnType}}
+    return {{returnType}}.class.newInstance(response)
+    {{/returnType}}
+    {{^returnType}}
+    return response
+    {{/returnType}}
+  }
+
+  {{/operation}}
+}
+{{/operations}}

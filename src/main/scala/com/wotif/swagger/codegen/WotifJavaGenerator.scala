@@ -3,12 +3,7 @@ package com.wotif.swagger.codegen
 import com.wordnik.swagger.codegen.BasicJavaGenerator
 import com.wordnik.swagger.model._
 
-object WotifJavaGenerator extends BasicJavaGenerator {
-
-  var invokerPackageOverride = "com.wotif.client.common"
-  var modelPackageOverride = "com.wotif.client.model"
-  var apiPackageOverride = "com.wotif.client.api"
-
+object WotifJavaGenerator extends WotifJavaGenerator {
   def main(args: Array[String]) = {
     if (args.length < 3) {
       throw new RuntimeException("Need to specify target API name")
@@ -19,6 +14,13 @@ object WotifJavaGenerator extends BasicJavaGenerator {
     apiPackageOverride = "com.wotif." + packageName + ".client.api"
     generateClient(args)
   }
+}
+
+class WotifJavaGenerator extends BasicJavaGenerator {
+
+  var invokerPackageOverride = "com.wotif.client.common"
+  var modelPackageOverride = "com.wotif.client.model"
+  var apiPackageOverride = "com.wotif.client.api"  
 
   override def typeMapping = Map(
     "Array" -> "List",
