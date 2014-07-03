@@ -15,15 +15,15 @@ import feign.codec.Encoder;
 import feign.jackson.JacksonDecoder;
 import javax.inject.Named;
 
-import java.io.IOException;
 {{#imports}}import {{import}};
 {{/imports}}
-
 {{#operations}}
+
 /**
  * Feign Proxy
  */
 interface {{classname}}Proxy {
+
   {{#operation}}
   @RequestLine("{{httpMethod}} {{path}}")
   {{#post}}
@@ -31,7 +31,7 @@ interface {{classname}}Proxy {
   @Headers("Content-Type: {{mediaType}};charset=UTF-8")
   {{/consumes}}
   {{/post}}
-  {{#returnType}}{{returnType}} {{/returnType}}{{^returnType}}Object {{/returnType}}{{nickname}}({{#allParams}}@Named("{{paramName}}") {{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
+  Response {{nickname}}({{#allParams}}@Named("{{paramName}}") {{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
   
   {{/operation}}
 }
@@ -55,7 +55,7 @@ public class {{classname}} {
    */
   public {{classname}}(String basePath) {
       if(basePath == null) {
-          throw new IllegalArgumentException("Base Path is null! Base Path for Green-Edge Service must be set before using client.");
+          throw new IllegalArgumentException("Base Path is null! Base Path for Service must be set before using client.");
       }
       setBasePath(basePath);
   }
@@ -84,12 +84,12 @@ public class {{classname}} {
   }
 
   {{#operation}}
-  public {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}Object {{/returnType}} {{nickname}} ({{#allParams}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
-  {{#returnType}} 
-  throws IOException
-  {{/returnType}}
+  public {{#returnType}}{{returnType}} {{/returnType}}{{^returnType}}Response {{/returnType}} {{nickname}} ({{#allParams}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
   {{#requiredParamCount}}
   throws ApiException
+  {{/requiredParamCount}}
+  {{^requiredParamCount}}
+  {{#returnType}} throws ApiException {{/returnType}}
   {{/requiredParamCount}}
   {
     {{#requiredParamCount}}
@@ -98,7 +98,22 @@ public class {{classname}} {
        throw new ApiException(400, "missing required params");
     }
     {{/requiredParamCount}}
-    return feignProxy.{{nickname}}({{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
+    Response response = feignProxy.{{nickname}}({{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
+    {{#returnType}}
+    {{#errorList}}
+    if(response.status() == {{code}}) {
+      throw new ApiException({{code}}, "{{reason}} - " + response.body().toString());
+    }
+    {{/errorList}}
+    try {
+      return {{returnType}}.class.cast(decoder.decode(response, {{returnType}}.class));
+    } catch (Exception e) {
+      throw new ApiException("Unexpected Response - " + response.body().toString());
+    }
+    {{/returnType}}
+    {{^returnType}}
+    return response;
+    {{/returnType}}
   }
 
   {{/operation}}

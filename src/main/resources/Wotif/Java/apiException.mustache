@@ -14,6 +14,10 @@ public class ApiException extends Exception {
 
   public ApiException() {}
 
+  public ApiException(String message) {
+    this(0, message);
+  }
+
   public ApiException(int code, String message) {
     this.code = code;
     this.message = message;
