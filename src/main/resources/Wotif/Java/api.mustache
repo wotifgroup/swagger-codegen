@@ -15,6 +15,7 @@ import feign.codec.Encoder;
 import feign.jackson.JacksonDecoder;
 import javax.inject.Named;
 
+import java.util.*;
 {{#imports}}import {{import}};
 {{/imports}}
 {{#operations}}
@@ -22,27 +23,27 @@ import javax.inject.Named;
 /**
  * Feign Proxy
  */
-interface {{classname}}Proxy {
+interface {{{classname}}}Proxy {
 
   {{#operation}}
-  @RequestLine("{{httpMethod}} {{path}}")
+  @RequestLine("{{{httpMethod}}} {{{path}}}{{#queryParams}}?{{{paramName}}}={ {{{paramName}}} }{{#hasMore}}&{{/hasMore}}{{/queryParams}}")
   {{#post}}
   {{#consumes}}
-  @Headers("Content-Type: {{mediaType}};charset=UTF-8")
+  @Headers("Content-Type: {{{mediaType}}};charset=UTF-8")
   {{/consumes}}
   {{/post}}
-  Response {{nickname}}({{#allParams}}@Named("{{paramName}}") {{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
+  {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}Object {{/returnType}} {{nickname}}({{#allParams}}@Named("{{{paramName}}}") {{dataType}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
   
   {{/operation}}
 }
 
 /**
- * {{classname}} Client
+ * {{{classname}}} Client
  * generated using Swagger-Codegen
  */
-public class {{classname}} {
+public class {{{classname}}} {
   private String basePath;
-  private {{classname}}Proxy feignProxy;
+  private {{{classname}}}Proxy feignProxy;
   private Encoder encoder;
   private Decoder decoder;
 
@@ -84,36 +85,18 @@ public class {{classname}} {
   }
 
   {{#operation}}
-  public {{#returnType}}{{returnType}} {{/returnType}}{{^returnType}}Response {{/returnType}} {{nickname}} ({{#allParams}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
+  public {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}Object {{/returnType}} {{{nickname}}} ({{#allParams}}{{{dataType}}} {{{paramName}}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
   {{#requiredParamCount}}
   throws ApiException
-  {{/requiredParamCount}}
-  {{^requiredParamCount}}
-  {{#returnType}} throws ApiException {{/returnType}}
   {{/requiredParamCount}}
   {
     {{#requiredParamCount}}
     // verify required params are set
-    if({{/requiredParamCount}}{{#requiredParams}} {{paramName}} == null {{#hasMore}}|| {{/hasMore}}{{/requiredParams}}{{#requiredParamCount}}) {
+    if({{#requiredParams}} {{{paramName}}} == null {{#hasMore}}|| {{/hasMore}}{{/requiredParams}}) {
        throw new ApiException(400, "missing required params");
     }
     {{/requiredParamCount}}
-    Response response = feignProxy.{{nickname}}({{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
-    {{#returnType}}
-    {{#errorList}}
-    if(response.status() == {{code}}) {
-      throw new ApiException({{code}}, "{{reason}} - " + response.body().toString());
-    }
-    {{/errorList}}
-    try {
-      return {{returnType}}.class.cast(decoder.decode(response, {{returnType}}.class));
-    } catch (Exception e) {
-      throw new ApiException("Unexpected Response - " + response.body().toString());
-    }
-    {{/returnType}}
-    {{^returnType}}
-    return response;
-    {{/returnType}}
+    return feignProxy.{{{nickname}}}({{#allParams}}{{{paramName}}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
   }
 
   {{/operation}}
