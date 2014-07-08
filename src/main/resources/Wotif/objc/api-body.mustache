@@ -13,9 +13,15 @@ static NSString * basePath = @"{{basePath}}";
 
     if (singletonAPI == nil) {
         singletonAPI = [[{{classname}} alloc] init];
-        [singletonAPI addHeader:headerValue forKey:key];
+        if (headerValue != nil) {
+          [singletonAPI addHeader:headerValue forKey:key];
+        }
     }
     return singletonAPI;
+}
+
++({{classname}} *) apiInstance {
+    return [{{classname}} apiWithHeader:nil key: nil];  
 }
 
 +(void) setBasePath:(NSString*)path {
@@ -68,12 +74,14 @@ static NSString * basePath = @"{{basePath}}";
     NSString* responseContentType = @"application/json";
 
     NSMutableDictionary* queryParams = [[NSMutableDictionary alloc] init];
-    {{#queryParams}}if({{paramName}} != nil)
-        queryParams[@"{{baseName}}"] = {{paramName}};
+    {{#queryParams}}
+    if ({{paramName}} != nil) 
+        queryParams[@"{{baseName}}"] = {{paramName}};    
     {{/queryParams}}
         NSMutableDictionary* headerParams = [[NSMutableDictionary alloc] init];
-    {{#headerParams}}if({{paramName}} != nil)
-        headerParams[@"{{baseName}}"] = {{paramName}};
+    {{#headerParams}}
+    if ({{paramName}} != nil)
+        headerParams[@"{{baseName}}"] = {{paramName}};    
     {{/headerParams}}
 
     id bodyDictionary = nil;
@@ -121,7 +129,7 @@ static NSString * basePath = @"{{basePath}}";
     {{/requiredParams}}
     {{/requiredParamCount}}
 
-    SWGApiClient* client = [SWGApiClient sharedClientFromPool:basePath];
+    SWGApiClient *client = [SWGApiClient sharedClientFromPool:basePath];
 
     {{#returnContainer}}
     return [client dictionary: requestUrl 

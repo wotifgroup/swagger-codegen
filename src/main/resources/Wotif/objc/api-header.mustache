@@ -8,9 +8,10 @@
 
 -(void) addHeader:(NSString*)value forKey:(NSString*)key;
 -(unsigned long) requestQueueSize;
-+({{classname}}*) apiWithHeader:(NSString*)headerValue key:(NSString*)key;
++({{classname}} *) apiWithHeader:(NSString*)headerValue key:(NSString*)key;
++({{classname}} *) apiInstance;
 +(void) setBasePath:(NSString*)basePath;
-+(NSString*) getBasePath;
++(NSString *) getBasePath;
 {{#operation}}
 /**
 
@@ -24,7 +25,7 @@
  {{/allParams}}
 
  */
--(NSNumber*) {{nickname}}WithCompletionBlock {{^allParams}}:{{/allParams}}{{#allParams}}{{#secondaryParam}} {{paramName}}{{/secondaryParam}}:({{{dataType}}}) {{paramName}} {{#hasMore}}{{newline}}        {{/hasMore}}{{/allParams}}
+-(NSNumber *) {{nickname}}WithCompletionBlock {{^allParams}}:{{/allParams}}{{#allParams}}{{#secondaryParam}} {{paramName}}{{/secondaryParam}}:({{{dataType}}}){{paramName}} {{#hasMore}}{{newline}}        {{/hasMore}}{{/allParams}}
         {{#returnBaseType}}{{#hasParams}}{{newline}}        completionHandler: {{/hasParams}}(void (^)({{returnType}} output, NSError* error))completionBlock;{{/returnBaseType}}
         {{^returnBaseType}}{{#hasParams}}{{newline}}        completionHandler: {{/hasParams}}(void (^)(NSDictionary* output, NSError* error))completionBlock;{{/returnBaseType}}
 
