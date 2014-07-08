@@ -10,6 +10,8 @@ package {{package}};
 import {{import}};
 {{/imports}}
 
+import org.apache.commons.lang.NullArgumentException;
+
 {{#models}}
 {{#model}}
 public class {{classname}} {
@@ -17,26 +19,38 @@ public class {{classname}} {
 
   {{#description}}/* {{{description}}} */
   {{/description}}
-  private {{{datatype}}} {{name}} = {{{defaultValue}}};
+  private {{{datatype}}} {{name}}{{^required}} = {{{defaultValue}}}{{/required}};
+
   {{#allowableValues}}{{#min}} // range from {{min}} to {{max}}
   {{/min}}
   //{{^min}}public enum {{name}}Enum { {{#values}} {{.}}, {{/values}} };
   {{/min}}
   {{/allowableValues}}
-
   {{/vars}}
-
   {{#vars}}
 
   public {{{datatype}}} {{getter}}() {
     return {{name}};
   }
+
   public {{classname}} {{setter}}({{{datatype}}} {{name}}) {
+    {{#required}}
+    if({{name}} == null) {
+      throw new NullArgumentException("{{name}} cannot be null");
+    }
+    {{/required}}
     this.{{name}} = {{name}};
     return this;
   }
 
   {{/vars}}
+  public {{classname}}({{#vars}}{{#required}}{{{datatype}}} {{name}}{{#hasMore}}, {{/hasMore}}{{/required}}{{/vars}}) {
+    {{#vars}}
+    {{#required}}
+    {{setter}}({{name}});
+    {{/required}}
+    {{/vars}}
+  }
 
   @Override
   public String toString()  {
