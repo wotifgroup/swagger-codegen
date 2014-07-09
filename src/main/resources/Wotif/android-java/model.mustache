@@ -1,0 +1,47 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// This file was generated using Swagger Codegen, specialised for Wotif.com
+//
+////////////////////////////////////////////////////////////////////////////////
+
+package {{package}};
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+{{#imports}}import {{import}};
+{{/imports}}
+{{#models}}
+{{#model}}
+public class {{classname}} {
+  {{#vars}}
+
+  {{#description}}/* {{{description}}} */
+  {{/description}}
+  @JsonProperty("{{name}}")
+  private {{{datatype}}} {{name}} = {{{defaultValue}}};
+  {{/vars}}
+  
+  {{#vars}}
+  public {{{datatype}}} {{getter}}() {
+    return {{name}};
+  }
+  public {{classname}} {{setter}}({{{datatype}}} {{name}}) {
+    this.{{name}} = {{name}};
+    return this;
+  }
+
+  {{/vars}}
+
+  @Override
+  public String toString()  {
+    StringBuilder sb = new StringBuilder();
+    sb.append("{\n");
+    {{#vars}}
+    sb.append("\"{{name}}\":\"").append({{name}}).append("\"{{#hasMore}},{{/hasMore}}\n");
+    {{/vars}}
+    sb.append("}\n");
+    return sb.toString();
+  }
+}
+{{/model}}
+{{/models}}
