@@ -94,7 +94,7 @@ public class {{{classname}}} {
   {
     {{#requiredParamCount}}
     // verify required params are set
-    if({{#requiredParams}} {{{paramName}}} == null {{#hasMore}}|| {{/hasMore}}{{/requiredParams}}) {
+    if({{#requiredParams}} {{{paramName}}} == null{{#hasMore}} || {{/hasMore}}{{/requiredParams}}) {
        throw new ApiException(400, "missing required params");
     }
     {{/requiredParamCount}}
