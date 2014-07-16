@@ -10,6 +10,7 @@ package {{package}};
 import {{import}};
 {{/imports}}
 
+import com.fasterxml.jackson.annotation.*;
 import org.apache.commons.lang.NullArgumentException;
 
 {{#models}}
@@ -45,7 +46,9 @@ public class {{classname}} {
 
   {{/vars}}
 
-  public {{classname}}({{#vars}}{{#required}}{{{datatype}}} {{name}}{{#hasMore}}, {{/hasMore}}{{/required}}{{/vars}}) {
+
+  @JsonCreator  
+  public {{classname}}({{#vars}}{{#required}}@JsonProperty(value="{{name}}", required = true) {{{datatype}}} {{name}}{{#hasMore}}, {{/hasMore}}{{/required}}{{/vars}}) {
     {{#vars}}
     {{#required}}
     {{setter}}({{name}});
