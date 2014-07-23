@@ -37,7 +37,8 @@ class WotifJavaGenerator extends BasicJavaGenerator {
     "object" -> "Object",
     "integer" -> "Integer",
     "Map<string,string>" -> "Map<String,String>",
-    "Map<string,int>" -> "Map<String,Integer>")
+    "Map<string,int>" -> "Map<String,Integer>",
+    "Map" -> "Map")
 
   // import/require statements for specific datatypes
   override def importMapping = Map(
@@ -51,7 +52,8 @@ class WotifJavaGenerator extends BasicJavaGenerator {
     "LocalDate" -> "org.joda.time.*",
     "LocalTime" -> "org.joda.time.*",
     "Map[string,string]" -> "java.util.*",
-    "Map[string,int]" -> "java.util.*"
+    "Map[string,int]" -> "java.util.*",
+    "Map" -> "java.util.*"
   )
 
   // location of templates
@@ -86,19 +88,71 @@ class WotifJavaGenerator extends BasicJavaGenerator {
         val inner = {
           obj.items match {
             case Some(items) => items.ref.getOrElse(items.`type`)
-            case _ => {
-              println("failed on " + dataType + ", " + obj)
-              throw new Exception("no inner type defined for " + dataType)
+            case None => {
+              println("*** WARNING ***: No inner type declared for " + dataType)
+              null
             }
           }
         }
-        "new ArrayList<" + toDeclaredType(inner) + ">" + "()"
+        if(inner == null) {
+          "new ArrayList()"
+        } else {
+          "new ArrayList<" + toDeclaredType(inner) + ">" + "()"
+        }
       }
       case "Map<String,String>" => "new HashMap<String,String>()"
       case "Map<String,Integer>" => "new HashMap<String,Integer>()"
+      case "Map" => "new HashMap()"
       case _ => "null"
     }
   }
+
+  override def toDeclaration(obj: ModelProperty) = {
+    var declaredType = toDeclaredType(obj.`type`)
+    declaredType match {
+      case "Array" => declaredType = "List"
+      case e: String => e
+    }
+
+    val defaultValue = toDefaultValue(declaredType, obj)
+    declaredType match {
+      case "List" => {
+        val inner = {
+          obj.items match {
+            case Some(items) => items.ref.getOrElse(items.`type`)
+            case None => {
+              println("*** WARNING ***: No inner type declared for " + declaredType)
+              null
+            }
+          }
+        }
+        if(inner == null) {
+            declaredType
+        } else {
+          declaredType += "<" + toDeclaredType(inner) + ">"
+        }
+      }
+      case "Set" => {
+        val inner = {
+          obj.items match {
+            case Some(items) => items.ref.getOrElse(items.`type`)
+            case _ => {
+              println("failed on " + declaredType + ", " + obj)
+              throw new Exception("no inner type defined")
+            }
+          }
+        }
+        declaredType += "<" + toDeclaredType(inner) + ">"
+      }
+      case "Map" => {
+        println("*** WARNING ***: No inner types declared for " + declaredType)
+        declaredType
+      }
+      case _ =>
+    }
+    (declaredType, defaultValue)
+  }
+
 
    // supporting classes
   override def supportingFiles =
