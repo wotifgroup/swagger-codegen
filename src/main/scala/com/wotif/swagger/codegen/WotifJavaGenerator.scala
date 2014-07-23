@@ -36,7 +36,8 @@ class WotifJavaGenerator extends BasicJavaGenerator {
     "double" -> "Double",
     "object" -> "Object",
     "integer" -> "Integer",
-    "Map<string,string>" -> "Map<String,String>")
+    "Map<string,string>" -> "Map<String,String>",
+    "Map<string,int>" -> "Map<String,Integer>")
 
   // import/require statements for specific datatypes
   override def importMapping = Map(
@@ -49,7 +50,8 @@ class WotifJavaGenerator extends BasicJavaGenerator {
     "LocalDateTime" -> "org.joda.time.*",
     "LocalDate" -> "org.joda.time.*",
     "LocalTime" -> "org.joda.time.*",
-    "Map[string,string]" -> "java.util.*"
+    "Map[string,string]" -> "java.util.*",
+    "Map[string,int]" -> "java.util.*"
   )
 
   // location of templates
@@ -86,13 +88,14 @@ class WotifJavaGenerator extends BasicJavaGenerator {
             case Some(items) => items.ref.getOrElse(items.`type`)
             case _ => {
               println("failed on " + dataType + ", " + obj)
-              throw new Exception("no inner type defined")
+              throw new Exception("no inner type defined for " + dataType)
             }
           }
         }
         "new ArrayList<" + toDeclaredType(inner) + ">" + "()"
       }
       case "Map<String,String>" => "new HashMap<String,String>()"
+      case "Map<String,Integer>" => "new HashMap<String,Integer>()"
       case _ => "null"
     }
   }
