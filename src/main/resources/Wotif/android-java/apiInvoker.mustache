@@ -6,6 +6,8 @@
 
 package {{invokerPackage}};
 
+import android.annotation.SuppressLint;
+
 import com.fasterxml.jackson.databind.*;
 
 import org.apache.http.*;
@@ -17,6 +19,7 @@ import org.apache.http.conn.ssl.*;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.*;
 import org.apache.http.impl.conn.*;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.*;
 import org.apache.http.util.EntityUtils;
 
@@ -72,7 +75,7 @@ public class ApiInvoker {
   @SuppressWarnings({ "unchecked", "rawtypes" })
   public static Object deserialize(String json, String containerType, Class cls) throws ApiException {
     try{
-      if("List".equals(containerType)) {
+      if("List".equals(containerType) || "Array".equals(containerType)) {
         JavaType typeInfo = JsonUtil.getJsonMapper().getTypeFactory().constructCollectionType(List.class, cls);
         List response = (List<?>) JsonUtil.getJsonMapper().readValue(json, typeInfo);
         return response;
@@ -218,10 +221,16 @@ public class ApiInvoker {
       } else {
         client = new DefaultHttpClient();
       }
+      //make the client thread safe
+      ClientConnectionManager connMgr = client.getConnectionManager();
+      HttpParams params = client.getParams();
+      client = new DefaultHttpClient(new ThreadSafeClientConnManager(params,
+              connMgr.getSchemeRegistry()), params);
     }
     return client;
   }
 
+  @SuppressLint("TrulyRandom")
   private void initConnectionManager() {
     try {
       final SSLContext sslContext = SSLContext.getInstance("SSL");
