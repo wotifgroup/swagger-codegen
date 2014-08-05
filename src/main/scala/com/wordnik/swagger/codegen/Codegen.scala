@@ -324,7 +324,10 @@ class Codegen(config: CodegenConfig) {
 
     queryParams.size match {
       case 0 =>
-      case _ => queryParams.last.asInstanceOf[HashMap[String, String]] -= "hasMore"
+      case _ => {
+        queryParams.head.asInstanceOf[HashMap[String, String]] += "first" -> "true"
+        queryParams.last.asInstanceOf[HashMap[String, String]] -= "hasMore"
+      }
     }
 
     pathParams.size match {

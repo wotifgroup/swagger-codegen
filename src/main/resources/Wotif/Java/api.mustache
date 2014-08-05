@@ -27,7 +27,7 @@ interface {{{classname}}}Proxy {
 
   {{#operation}}
   {{=<% %>=}}
-  @RequestLine("<% httpMethod %> <% path %>?<% #queryParams %><% paramName %>={<% paramName %>}<% #hasMore %>&<% /hasMore %><% /queryParams %>")
+  @RequestLine("<% httpMethod %> <% path %><% #queryParams %><% #first %>?<% /first %><% paramName %>={<% paramName %>}<% #hasMore %>&<% /hasMore %><% /queryParams %>")
   <%={{ }}=%>
   {{#post}}
   {{#consumes}}
