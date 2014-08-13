@@ -26,6 +26,10 @@ class WotifJavaGenerator extends BasicJavaGenerator {
     "Array" -> "List",
     "array" -> "List",
     "List" -> "List",
+    "BigDecimal" -> "BigDecimal",
+    "bigDecimal" -> "BigDecimal",
+    "Bigdecimal" -> "BigDecimal",
+    "bigdecimal" -> "BigDecimal",
     "boolean" -> "Boolean",
     "string" -> "String",
     "int" -> "Integer",
@@ -43,6 +47,7 @@ class WotifJavaGenerator extends BasicJavaGenerator {
   // import/require statements for specific datatypes
   override def importMapping = Map(
     "File" -> "java.io.File",
+    "BigDecimal" -> "java.math.BigDecimal",
     "Date" -> "java.util.Date",
     "Array" -> "java.util.*",
     "ArrayList" -> "java.util.*",
@@ -78,12 +83,14 @@ class WotifJavaGenerator extends BasicJavaGenerator {
 
   override def toDefaultValue(dataType: String, obj: ModelProperty) = {
     dataType match {
+      case "BigDecimal" => "null"
       case "Boolean" => "null"
       case "Integer" => "null"
       case "Long" => "null"
       case "Short" => "null"
       case "Float" => "null"
       case "Double" => "null"
+      case "BigDecimal" => "null"
       case "List" => {
         val inner = {
           obj.items match {
