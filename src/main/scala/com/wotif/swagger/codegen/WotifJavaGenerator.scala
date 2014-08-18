@@ -42,7 +42,10 @@ class WotifJavaGenerator extends BasicJavaGenerator {
     "integer" -> "Integer",
     "Map<string,string>" -> "Map<String,String>",
     "Map<string,int>" -> "Map<String,Integer>",
-    "Map" -> "Map")
+    "Map" -> "Node",
+    "Map" -> "Map",
+    "List<Map<string,string>>" -> "List<Map<String,String>>",
+    "Map<string,Node>" -> "Map<String,Node>")
 
   // import/require statements for specific datatypes
   override def importMapping = Map(
@@ -58,6 +61,8 @@ class WotifJavaGenerator extends BasicJavaGenerator {
     "LocalTime" -> "org.joda.time.*",
     "Map[string,string]" -> "java.util.*",
     "Map[string,int]" -> "java.util.*",
+    "List[Map[string,string]]" -> "java.util.*",
+    "Map[string,Node]" -> "groovy.util.*",
     "Map" -> "java.util.*"
   )
 
@@ -109,7 +114,9 @@ class WotifJavaGenerator extends BasicJavaGenerator {
       }
       case "Map<String,String>" => "new HashMap<String,String>()"
       case "Map<String,Integer>" => "new HashMap<String,Integer>()"
+      case "List<Map<String,String>>" => "new ArrayList<Map<String,String>>()"
       case "Map" => "new HashMap()"
+      case "Map<String,Node>" => "new HashMap<String,Node>()"
       case _ => "null"
     }
   }

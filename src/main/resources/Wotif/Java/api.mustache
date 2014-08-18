@@ -57,24 +57,42 @@ public class {{{classname}}} {
    * @param basePath - the base URL path for the service
    */
   public {{classname}}(String basePath) {
+      this(basePath, null);
+  }
+
+  /**
+   * @param basePath - the base URL path for the service
+   * @param requestInterceptor - interceptor to adjust headers
+   */
+  public {{classname}}(String basePath, RequestInterceptor requestInterceptor) {
       if(basePath == null) {
           throw new IllegalArgumentException("Base Path is null! Base Path for Service must be set before using client.");
       }
-      setBasePath(basePath);
+      setBasePath(basePath, requestInterceptor);
   }
 
   /**
    * Sets the base URL path for the service
    * @param basePath
    */
- public {{className}} setBasePath(String basePath) {
+  public {{className}} setBasePath(String basePath) {
+      return setBasePath(basePath, null);
+  }
+
+  /**
+   * Sets the base URL path for the service
+   * @param basePath
+   * @param requestInterceptor - interceptor to adjust headers
+   */
+ public {{className}} setBasePath(String basePath, RequestInterceptor requestInterceptor) {
     this.basePath = basePath;
     this.decoder = new JacksonDecoder();
     this.encoder = new PostBodyEncoder();
-    feignProxy = Feign.builder()
-                     .encoder(encoder)
-                     .decoder(decoder)
-                     .target({{classname}}Proxy.class, basePath);
+    Feign.Builder builder = Feign.builder().encoder(encoder).decoder(decoder);
+    if (requestInterceptor != null) {
+      builder.requestInterceptor(requestInterceptor);
+    }
+    feignProxy = builder.target({{classname}}Proxy.class, basePath);
     return this;
   }
   
