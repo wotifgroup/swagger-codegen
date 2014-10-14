@@ -1,5 +1,5 @@
 /**
- *  Copyright 2013 Wordnik, Inc.
+ *  Copyright 2014 Wordnik, Inc.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.wordnik.swagger.codegen.util
 
-import com.wordnik.swagger.model._
+import com.wordnik.swagger.codegen.model._
 
 import scala.collection.mutable.{ HashSet, ListBuffer, HashMap }
 import scala.collection.JavaConversions._
@@ -35,7 +35,7 @@ object CoreUtils {
 
   def extractModelNames(op: Operation): Set[String] = {
 //    // POST, PUT, DELETE body
-    val modelNames = Set(op.responseClass) ++ op.parameters.filter(_.paramType == "body").map(_.dataType)
+    val modelNames = Set(op.responseClass) ++ op.parameters.filter(_.paramType == "body").map(_.dataType) ++ op.responseMessages.filter(!_.responseModel.isEmpty).map(_.responseModel.get)
     modelNames map extractBasePartFromType
   }
 

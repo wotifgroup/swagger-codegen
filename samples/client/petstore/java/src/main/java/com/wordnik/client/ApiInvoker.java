@@ -11,6 +11,7 @@ import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.api.client.filter.LoggingFilter;
 import com.sun.jersey.api.client.WebResource.Builder;
+import com.sun.jersey.multipart.FormDataMultiPart;
 
 import javax.ws.rs.core.Response.Status.Family;
 import javax.ws.rs.core.MediaType;
@@ -26,6 +27,11 @@ public class ApiInvoker {
   private static ApiInvoker INSTANCE = new ApiInvoker();
   private Map<String, Client> hostMap = new HashMap<String, Client>();
   private Map<String, String> defaultHeaderMap = new HashMap<String, String>();
+  private boolean isDebug = false;
+
+  public void enableDebug() {
+    isDebug = true;
+  }
 
   public static ApiInvoker getInstance() {
     return INSTANCE;
@@ -112,7 +118,10 @@ public class ApiInvoker {
     }
     else if ("POST".equals(method)) {
       if(body == null)
-        response = builder.post(ClientResponse.class, serialize(body));
+        response = builder.post(ClientResponse.class, null);
+      else if(body instanceof FormDataMultiPart) {
+        response = builder.type(contentType).post(ClientResponse.class, body);
+      }
       else
         response = builder.type(contentType).post(ClientResponse.class, serialize(body));
     }
@@ -124,8 +133,8 @@ public class ApiInvoker {
           StringBuilder formParamBuilder = new StringBuilder();
 
           // encode the form params
-          for(String key : headerParams.keySet()) {
-            String value = headerParams.get(key);
+          for(String key : formParams.keySet()) {
+            String value = formParams.get(key);
             if(value != null && !"".equals(value.trim())) {
               if(formParamBuilder.length() > 0) {
                 formParamBuilder.append("&");
@@ -169,7 +178,8 @@ public class ApiInvoker {
   private Client getClient(String host) {
     if(!hostMap.containsKey(host)) {
       Client client = Client.create();
-      client.addFilter(new LoggingFilter());
+      if(isDebug)
+        client.addFilter(new LoggingFilter());
       hostMap.put(host, client);
     }
     return hostMap.get(host);

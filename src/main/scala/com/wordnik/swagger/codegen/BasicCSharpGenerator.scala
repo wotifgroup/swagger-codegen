@@ -1,5 +1,5 @@
 /**
- *  Copyright 2013 Wordnik, Inc.
+ *  Copyright 2014 Wordnik, Inc.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.wordnik.swagger.codegen
 
-import com.wordnik.swagger.model._
+import com.wordnik.swagger.codegen.model._
 
 object BasicCSharpGenerator extends BasicCSharpGenerator {
   def main(args: Array[String]) = generateClient(args)
@@ -41,26 +41,30 @@ class BasicCSharpGenerator extends BasicGenerator {
    * We are using csharp objects instead of primitives to avoid showing default
    * primitive values when the API returns missing data.  For instance, having a
    * {"count":0} != count is unknown.  You can change this to use primitives if you
-   * desire, but update the default values as well or they'll be set to null in 
+   * desire, but update the default values as well or they'll be set to null in
    * variable declarations.
    */
   override def typeMapping = Map(
     "array" -> "List",
-    "boolean" -> "bool",
+    "boolean" -> "bool?",
     "string" -> "string",
-    "int" -> "int",
-    "float" -> "float",
-    "long" -> "long",
-    "double" -> "double",
+    "int" -> "int?",
+    "float" -> "float?",
+    "long" -> "long?",
+    "double" -> "double?",
     "object" -> "object",
-    "Date" -> "DateTime",
-    "date" -> "DateTime")
+    "Date" -> "DateTime?",
+    "date" -> "DateTime?",
+    "File" -> "byte[]",
+    "file" -> "byte[]")
 
   // location of templates
   override def templateDir = "csharp"
 
   // where to write generated code
-  override def destinationDir = "generated-code/csharp/src/main/csharp"
+  override def destinationDir = "generated-code/csharp/src"
+
+  override def invokerPackage: Option[String] = Some("Swagger.Client.Common")
 
   // template used for models
   modelTemplateFiles += "model.mustache" -> ".cs"
@@ -68,21 +72,21 @@ class BasicCSharpGenerator extends BasicGenerator {
   // template used for models
   apiTemplateFiles += "api.mustache" -> ".cs"
 
-  override def reservedWords = Set("abstract", "continue", "for", "new", "switch", "assert", 
-      "default", "if", "package", "synchronized", "do", "goto", "private", "this", "break", 
-      "implements", "protected", "throw", "else", "import", "public", "throws", "case", 
-      "enum", "instanceof", "return", "transient", "catch", "extends", "try", "final", 
-      "interface", "static", "void", "class", "finally", "strictfp", "volatile", "const", 
+  override def reservedWords = Set("abstract", "continue", "for", "new", "switch", "assert",
+      "default", "if", "package", "synchronized", "do", "goto", "private", "this", "break",
+      "implements", "protected", "throw", "else", "import", "public", "throws", "case",
+      "enum", "instanceof", "return", "transient", "catch", "extends", "try", "final",
+      "interface", "static", "void", "class", "finally", "strictfp", "volatile", "const",
       "native", "super", "while")
 
   // import/require statements for specific datatypes
   override def importMapping = Map()
 
   // package for models
-  override def modelPackage = Some("Com.Wordnik.Client.Model")
+  override def modelPackage: Option[String] = Some("Swagger.Client.Model")
 
   // package for api classes
-  override def apiPackage = Some("Com.Wordnik.Client.Api")
+  override def apiPackage: Option[String] = Some("Swagger.Client.Api")
 
   // file suffix
   override def fileSuffix = ".cs"
@@ -178,7 +182,7 @@ class BasicCSharpGenerator extends BasicGenerator {
   }
 
   override def escapeReservedWord(word: String) = {
-    if (reservedWords.contains(word)) 
+    if (reservedWords.contains(word))
       throw new Exception("reserved word " + "\"" + word + "\" not allowed")
     else word
   }
@@ -191,15 +195,15 @@ class BasicCSharpGenerator extends BasicGenerator {
     capitalize(name)
   }
 
-  def capitalize(s: String) = { 
-    s(0).toUpper + s.substring(1, s.length).toLowerCase 
+  def capitalize(s: String) = {
+    s(0).toUpper + s.substring(1, s.length).toLowerCase
   }*/
 
   // supporting classes
   override def supportingFiles =
     List(
-      ("apiInvoker.mustache", destinationDir + java.io.File.separator + invokerPackage.get.replace(".", java.io.File.separator) + java.io.File.separator, "ApiInvoker.java"),
-      ("apiException.mustache", destinationDir + java.io.File.separator + invokerPackage.get.replace(".", java.io.File.separator) + java.io.File.separator, "ApiException.java"),
+      ("apiInvoker.mustache", destinationDir + java.io.File.separator + invokerPackage.get.replace(".", java.io.File.separator) + java.io.File.separator, "ApiInvoker.cs"),
+      ("apiException.mustache", destinationDir + java.io.File.separator + invokerPackage.get.replace(".", java.io.File.separator) + java.io.File.separator, "ApiException.cs"),
       ("Newtonsoft.Json.dll", "generated-code/csharp/bin", "Newtonsoft.Json.dll"),
       ("compile.mustache", "generated-code/csharp", "compile.bat"))
 }

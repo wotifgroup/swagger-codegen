@@ -1,5 +1,5 @@
 /**
- *  Copyright 2013 Wordnik, Inc.
+ *  Copyright 2014 Wordnik, Inc.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package com.wordnik.swagger.codegen
 
-import com.wordnik.swagger.model._
+import com.wordnik.swagger.codegen.model._
 
 object BasicJavaGenerator extends BasicJavaGenerator {
   def main(args: Array[String]) = generateClient(args)
@@ -73,20 +73,22 @@ class BasicJavaGenerator extends BasicGenerator {
   apiTemplateFiles += "api.mustache" -> ".java"
 
   override def reservedWords = Set("abstract", "continue", "for", "new", "switch", "assert", 
-      "default", "if", "package", "synchronized", "boolean", "do", "goto", "private", 
-      "this", "break", "double", "implements", "protected", "throw", "byte", "else", 
-      "import", "public", "throws", "case", "enum", "instanceof", "return", "transient", 
-      "catch", "extends", "int", "short", "try", "char", "final", "interface", "static", 
-      "void", "class", "finally", "long", "strictfp", "volatile", "const", "float", 
-      "native", "super", "while")
+    "default", "if", "package", "synchronized", "boolean", "do", "goto", "private", 
+    "this", "break", "double", "implements", "protected", "throw", "byte", "else", 
+    "import", "public", "throws", "case", "enum", "instanceof", "return", "transient", 
+    "catch", "extends", "int", "short", "try", "char", "final", "interface", "static", 
+    "void", "class", "finally", "long", "strictfp", "volatile", "const", "float", 
+    "native", "super", "while")
 
   // import/require statements for specific datatypes
   override def importMapping = Map(
     "File" -> "java.io.File",
     "Date" -> "java.util.Date",
+    "Timestamp" -> "java.sql.Timestamp",
     "Array" -> "java.util.*",
     "ArrayList" -> "java.util.*",
     "List" -> "java.util.*",
+    "Set" -> "java.util.*",
     "DateTime" -> "org.joda.time.*",
     "LocalDateTime" -> "org.joda.time.*",
     "LocalDate" -> "org.joda.time.*",
@@ -94,10 +96,10 @@ class BasicJavaGenerator extends BasicGenerator {
   )
 
   // package for models
-  override def modelPackage = Some("com.wordnik.client.model")
+  override def modelPackage: Option[String] = Some("com.wordnik.client.model")
 
   // package for api classes
-  override def apiPackage = Some("com.wordnik.client.api")
+  override def apiPackage: Option[String] = Some("com.wordnik.client.api")
 
   // file suffix
   override def fileSuffix = ".java"
@@ -105,6 +107,16 @@ class BasicJavaGenerator extends BasicGenerator {
   override def toVarName(name: String): String = {
     val paramName = name.replaceAll("[^a-zA-Z0-9_]","")
     super.toVarName(paramName)
+  }
+
+  override def toApiFilename(name: String): String = {
+    val paramName = name.replaceAll("[^a-zA-Z0-9_]","")
+    super.toApiFilename(paramName)
+  }
+
+  override def toApiName(name: String): String = {
+    val paramName = name.replaceAll("[^a-zA-Z0-9_]","")
+    super.toApiName(paramName)
   }
 
   // response classes

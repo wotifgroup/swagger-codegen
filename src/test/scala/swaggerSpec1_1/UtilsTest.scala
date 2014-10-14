@@ -1,5 +1,5 @@
 /**
- *  Copyright 2013 Wordnik, Inc.
+ *  Copyright 2014 Wordnik, Inc.
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");
  *  you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
  */
 package swaggerSpec1_1
 
-import com.wordnik.swagger.model._
+import com.wordnik.swagger.codegen.model._
 import com.wordnik.swagger.codegen.util.{ResourceExtractor, ApiExtractor, CoreUtils}
 
 import org.junit.runner.RunWith
@@ -24,7 +24,7 @@ import org.scalatest.FlatSpec
 import org.scalatest.matchers.ShouldMatchers
 
 import scala.collection.JavaConverters._
-import scala.reflect.BeanProperty
+import scala.beans.BeanProperty
 
 @RunWith(classOf[JUnitRunner])
 class ResourceExtractorTest extends FlatSpec with ShouldMatchers {

@@ -1,7 +1,7 @@
 package com.wotif.swagger.codegen
 
 import com.wordnik.swagger.codegen.BasicJavaGenerator
-import com.wordnik.swagger.model._
+import com.wordnik.swagger.codegen.model._
 
 object WotifJavaGenerator extends WotifJavaGenerator {
   def main(args: Array[String]) = {
@@ -12,6 +12,7 @@ object WotifJavaGenerator extends WotifJavaGenerator {
     invokerPackageOverride = "com.wotif." + packageName + ".client.common"
     modelPackageOverride = "com.wotif." + packageName + ".client.model"
     apiPackageOverride = "com.wotif." + packageName + ".client.api"
+
     generateClient(args)
   }
 }
@@ -26,6 +27,7 @@ class WotifJavaGenerator extends BasicJavaGenerator {
     "Array" -> "List",
     "array" -> "List",
     "List" -> "List",
+    "Map" -> "Map",
     "BigDecimal" -> "BigDecimal",
     "bigDecimal" -> "BigDecimal",
     "Bigdecimal" -> "BigDecimal",
@@ -33,19 +35,18 @@ class WotifJavaGenerator extends BasicJavaGenerator {
     "boolean" -> "Boolean",
     "string" -> "String",
     "int" -> "Integer",
+    "integer" -> "Integer",
     "float" -> "Float",
     "long" -> "Long",
     "short" -> "Short",
     "char" -> "String",
     "double" -> "Double",
     "object" -> "Object",
-    "integer" -> "Integer",
     "Map<string,string>" -> "Map<String,String>",
     "Map<string,int>" -> "Map<String,Integer>",
-    "Map" -> "Node",
-    "Map" -> "Map",
-    "List<Map<string,string>>" -> "List<Map<String,String>>",
-    "Map<string,Node>" -> "Map<String,Node>")
+    "Map<string,boolean>" -> "Map<String,Boolean>",
+    "Map<string,Node>" -> "Map<String,Node>",
+    "List<Map<string,string>>" -> "List<Map<String,String>>")
 
   // import/require statements for specific datatypes
   override def importMapping = Map(
@@ -55,6 +56,7 @@ class WotifJavaGenerator extends BasicJavaGenerator {
     "Array" -> "java.util.*",
     "ArrayList" -> "java.util.*",
     "List" -> "java.util.*",
+    "Map" -> "java.util.*",
     "DateTime" -> "org.joda.time.*",
     "LocalDateTime" -> "org.joda.time.*",
     "LocalDate" -> "org.joda.time.*",
@@ -62,8 +64,10 @@ class WotifJavaGenerator extends BasicJavaGenerator {
     "Map[string,string]" -> "java.util.*",
     "Map[string,int]" -> "java.util.*",
     "List[Map[string,string]]" -> "java.util.*",
-    "Map[string,Node]" -> "groovy.util.*",
-    "Map" -> "java.util.*"
+    "Map[string,Node]" -> "java.util.*",
+    //New mappings in base class for V2.0.17
+    "Timestamp" -> "java.sql.Timestamp",
+    "Set" -> "java.util.*"
   )
 
   // location of templates
@@ -88,34 +92,37 @@ class WotifJavaGenerator extends BasicJavaGenerator {
 
   override def toDefaultValue(dataType: String, obj: ModelProperty) = {
     dataType match {
-      case "BigDecimal" => "null"
-      case "Boolean" => "null"
-      case "Integer" => "null"
-      case "Long" => "null"
-      case "Short" => "null"
-      case "Float" => "null"
-      case "Double" => "null"
-      case "BigDecimal" => "null"
       case "List" => {
         val inner = {
           obj.items match {
             case Some(items) => items.ref.getOrElse(items.`type`)
-            case None => {
-              println("*** WARNING ***: No inner type declared for " + dataType)
-              null
-            }
+            case None => null
           }
         }
         if(inner == null) {
           "new ArrayList()"
         } else {
-          "new ArrayList<" + toDeclaredType(inner) + ">" + "()"
+          "new ArrayList<" + toDeclaredType(inner) + ">()"
         }
       }
+      case "Set" => {
+        val inner = {
+          obj.items match {
+            case Some(items) => items.ref.getOrElse(items.`type`)
+            case None => null
+          }
+        }
+        if(inner == null) {
+          "new HashSet()"
+        } else {
+          "new HashSet<" + toDeclaredType(inner) + ">()"
+        }
+      }
+      case "Map" => "new HashMap()"
       case "Map<String,String>" => "new HashMap<String,String>()"
       case "Map<String,Integer>" => "new HashMap<String,Integer>()"
+      case "Map<String,Boolean>" => "new HashMap<String,Boolean>()"
       case "List<Map<String,String>>" => "new ArrayList<Map<String,String>>()"
-      case "Map" => "new HashMap()"
       case "Map<String,Node>" => "new HashMap<String,Node>()"
       case _ => "null"
     }
@@ -130,7 +137,7 @@ class WotifJavaGenerator extends BasicJavaGenerator {
 
     val defaultValue = toDefaultValue(declaredType, obj)
     declaredType match {
-      case "List" => {
+      case "List" | "Set" => {
         val inner = {
           obj.items match {
             case Some(items) => items.ref.getOrElse(items.`type`)
@@ -141,22 +148,10 @@ class WotifJavaGenerator extends BasicJavaGenerator {
           }
         }
         if(inner == null) {
-            declaredType
+          declaredType
         } else {
           declaredType += "<" + toDeclaredType(inner) + ">"
         }
-      }
-      case "Set" => {
-        val inner = {
-          obj.items match {
-            case Some(items) => items.ref.getOrElse(items.`type`)
-            case _ => {
-              println("failed on " + declaredType + ", " + obj)
-              throw new Exception("no inner type defined")
-            }
-          }
-        }
-        declaredType += "<" + toDeclaredType(inner) + ">"
       }
       case "Map" => {
         println("*** WARNING ***: No inner types declared for " + declaredType)

@@ -130,13 +130,15 @@ and override the `templateDir` in your script to point to the right place.  It a
 ### Where is Javascript???
 See our [javascript library](http://github.com/wordnik/swagger.js)--it's completely dynamic and doesn't require
 static code generation.
+There is a third-party component called [swagger-js-codegen](https://github.com/wcandillon/swagger-js-codegen) that can generate angularjs or nodejs source code from a swagger specification.
+
 
 #### Generating a client from flat files (i.e. no remote server calls)
 If you don't want to call your server, you can save the swagger spec files into a directory and pass an argument
 to the code generator like this:
 
 ```
--DfileMap=/path/to/files
+-DfileMap=/path/to/resource-listing
 ```
 
 Or for example:

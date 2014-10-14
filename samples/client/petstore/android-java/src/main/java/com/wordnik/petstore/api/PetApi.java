@@ -2,9 +2,9 @@ package com.wordnik.petstore.api;
 
 import com.wordnik.client.ApiException;
 import com.wordnik.client.ApiInvoker;
-import java.io.File;
 import com.wordnik.petstore.model.Pet;
 import java.util.*;
+import java.io.File;
 
 public class PetApi {
   String basePath = "http://petstore.swagger.wordnik.com/api";
@@ -17,15 +17,17 @@ public class PetApi {
   public ApiInvoker getInvoker() {
     return apiInvoker;
   }
-  
+
   public void setBasePath(String basePath) {
     this.basePath = basePath;
   }
-  
+
   public String getBasePath() {
     return basePath;
   }
 
+  //error info- code: 400 reason: "Invalid ID supplied" model: <none>
+  //error info- code: 404 reason: "Pet not found" model: <none>
   public Pet getPetById (Long petId) throws ApiException {
     // verify required params are set
     if(petId == null ) {
@@ -57,68 +59,7 @@ public class PetApi {
       }
     }
   }
-  public void deletePet (String petId) throws ApiException {
-    // verify required params are set
-    if(petId == null ) {
-       throw new ApiException(400, "missing required params");
-    }
-    // create path and map variables
-    String path = "/pet/{petId}".replaceAll("\\{format\\}","json").replaceAll("\\{" + "petId" + "\\}", apiInvoker.escapeString(petId.toString()));
-
-    // query params
-    Map<String, String> queryParams = new HashMap<String, String>();
-    Map<String, String> headerParams = new HashMap<String, String>();
-
-    String contentType = "application/json";
-
-    try {
-      String response = apiInvoker.invokeAPI(basePath, path, "DELETE", queryParams, null, headerParams, contentType);
-      if(response != null){
-        return ;
-      }
-      else {
-        return ;
-      }
-    } catch (ApiException ex) {
-      if(ex.getCode() == 404) {
-        return ;
-      }
-      else {
-        throw ex;
-      }
-    }
-  }
-  public List<Pet> partialUpdate (String petId, Pet body) throws ApiException {
-    // verify required params are set
-    if(petId == null || body == null ) {
-       throw new ApiException(400, "missing required params");
-    }
-    // create path and map variables
-    String path = "/pet/{petId}".replaceAll("\\{format\\}","json").replaceAll("\\{" + "petId" + "\\}", apiInvoker.escapeString(petId.toString()));
-
-    // query params
-    Map<String, String> queryParams = new HashMap<String, String>();
-    Map<String, String> headerParams = new HashMap<String, String>();
-
-    String contentType = "application/json";
-
-    try {
-      String response = apiInvoker.invokeAPI(basePath, path, "PATCH", queryParams, body, headerParams, contentType);
-      if(response != null){
-        return (List<Pet>) ApiInvoker.deserialize(response, "Array", Pet.class);
-      }
-      else {
-        return null;
-      }
-    } catch (ApiException ex) {
-      if(ex.getCode() == 404) {
-        return null;
-      }
-      else {
-        throw ex;
-      }
-    }
-  }
+  //error info- code: 405 reason: "Invalid input" model: <none>
   public void updatePetWithForm (String petId, String name, String status) throws ApiException {
     // verify required params are set
     if(petId == null ) {
@@ -150,9 +91,14 @@ public class PetApi {
       }
     }
   }
-  public void uploadFile (String additionalMetadata, File body) throws ApiException {
+  //error info- code: 400 reason: "Invalid pet value" model: <none>
+  public void deletePet (String petId) throws ApiException {
+    // verify required params are set
+    if(petId == null ) {
+       throw new ApiException(400, "missing required params");
+    }
     // create path and map variables
-    String path = "/pet/uploadImage".replaceAll("\\{format\\}","json");
+    String path = "/pet/{petId}".replaceAll("\\{format\\}","json").replaceAll("\\{" + "petId" + "\\}", apiInvoker.escapeString(petId.toString()));
 
     // query params
     Map<String, String> queryParams = new HashMap<String, String>();
@@ -161,7 +107,7 @@ public class PetApi {
     String contentType = "application/json";
 
     try {
-      String response = apiInvoker.invokeAPI(basePath, path, "POST", queryParams, body, headerParams, contentType);
+      String response = apiInvoker.invokeAPI(basePath, path, "DELETE", queryParams, null, headerParams, contentType);
       if(response != null){
         return ;
       }
@@ -177,6 +123,39 @@ public class PetApi {
       }
     }
   }
+  //error info- code: 400 reason: "Invalid tag value" model: <none>
+  public List<Pet> partialUpdate (String petId, Pet body) throws ApiException {
+    // verify required params are set
+    if(petId == null || body == null ) {
+       throw new ApiException(400, "missing required params");
+    }
+    // create path and map variables
+    String path = "/pet/{petId}".replaceAll("\\{format\\}","json").replaceAll("\\{" + "petId" + "\\}", apiInvoker.escapeString(petId.toString()));
+
+    // query params
+    Map<String, String> queryParams = new HashMap<String, String>();
+    Map<String, String> headerParams = new HashMap<String, String>();
+
+    String contentType = "application/json";
+
+    try {
+      String response = apiInvoker.invokeAPI(basePath, path, "PATCH", queryParams, body, headerParams, contentType);
+      if(response != null){
+        return (List<Pet>) ApiInvoker.deserialize(response, "List", Pet.class);
+      }
+      else {
+        return null;
+      }
+    } catch (ApiException ex) {
+      if(ex.getCode() == 404) {
+        return null;
+      }
+      else {
+        throw ex;
+      }
+    }
+  }
+  //error info- code: 405 reason: "Invalid input" model: <none>
   public void addPet (Pet body) throws ApiException {
     // verify required params are set
     if(body == null ) {
@@ -208,6 +187,9 @@ public class PetApi {
       }
     }
   }
+  //error info- code: 400 reason: "Invalid ID supplied" model: <none>
+  //error info- code: 404 reason: "Pet not found" model: <none>
+  //error info- code: 405 reason: "Validation exception" model: <none>
   public void updatePet (Pet body) throws ApiException {
     // verify required params are set
     if(body == null ) {
@@ -239,6 +221,7 @@ public class PetApi {
       }
     }
   }
+  //error info- code: 400 reason: "Invalid status value" model: <none>
   public List<Pet> findPetsByStatus (String status) throws ApiException {
     // verify required params are set
     if(status == null ) {
@@ -258,7 +241,7 @@ public class PetApi {
     try {
       String response = apiInvoker.invokeAPI(basePath, path, "GET", queryParams, null, headerParams, contentType);
       if(response != null){
-        return (List<Pet>) ApiInvoker.deserialize(response, "Array", Pet.class);
+        return (List<Pet>) ApiInvoker.deserialize(response, "List", Pet.class);
       }
       else {
         return null;
@@ -272,6 +255,7 @@ public class PetApi {
       }
     }
   }
+  //error info- code: 400 reason: "Invalid tag value" model: <none>
   public List<Pet> findPetsByTags (String tags) throws ApiException {
     // verify required params are set
     if(tags == null ) {
@@ -291,7 +275,7 @@ public class PetApi {
     try {
       String response = apiInvoker.invokeAPI(basePath, path, "GET", queryParams, null, headerParams, contentType);
       if(response != null){
-        return (List<Pet>) ApiInvoker.deserialize(response, "Array", Pet.class);
+        return (List<Pet>) ApiInvoker.deserialize(response, "List", Pet.class);
       }
       else {
         return null;
@@ -299,6 +283,33 @@ public class PetApi {
     } catch (ApiException ex) {
       if(ex.getCode() == 404) {
         return null;
+      }
+      else {
+        throw ex;
+      }
+    }
+  }
+  public void uploadFile (String additionalMetadata, File file) throws ApiException {
+    // create path and map variables
+    String path = "/pet/uploadImage".replaceAll("\\{format\\}","json");
+
+    // query params
+    Map<String, String> queryParams = new HashMap<String, String>();
+    Map<String, String> headerParams = new HashMap<String, String>();
+
+    String contentType = "application/json";
+
+    try {
+      String response = apiInvoker.invokeAPI(basePath, path, "POST", queryParams, null, headerParams, contentType);
+      if(response != null){
+        return ;
+      }
+      else {
+        return ;
+      }
+    } catch (ApiException ex) {
+      if(ex.getCode() == 404) {
+        return ;
       }
       else {
         throw ex;

@@ -2,7 +2,13 @@ package com.wordnik.petstore.api;
 
 import com.wordnik.client.ApiException;
 import com.wordnik.client.ApiInvoker;
+
 import com.wordnik.petstore.model.User;
+import com.sun.jersey.multipart.FormDataMultiPart;
+
+import javax.ws.rs.core.MediaType;
+
+import java.io.File;
 import java.util.*;
 
 public class UserApi {
@@ -21,112 +27,10 @@ public class UserApi {
     return basePath;
   }
 
-  public void createUser (User body) throws ApiException {
-    // verify required params are set
-    if(body == null ) {
-       throw new ApiException(400, "missing required params");
-    }
-    // create path and map variables
-    String path = "/user".replaceAll("\\{format\\}","json");
-
-    // query params
-    Map<String, String> queryParams = new HashMap<String, String>();
-    Map<String, String> headerParams = new HashMap<String, String>();
-    Map<String, String> formParams = new HashMap<String, String>();
-
-    String[] contentTypes = {
-      "application/json"};
-
-    String contentType = contentTypes.length > 0 ? contentTypes[0] : "application/json";
-
-    try {
-      String response = apiInvoker.invokeAPI(basePath, path, "POST", queryParams, body, headerParams, formParams, contentType);
-      if(response != null){
-        return ;
-      }
-      else {
-        return ;
-      }
-    } catch (ApiException ex) {
-      if(ex.getCode() == 404) {
-      	return ;
-      }
-      else {
-        throw ex;
-      }
-    }
-  }
-  public void createUsersWithArrayInput (List<User> body) throws ApiException {
-    // verify required params are set
-    if(body == null ) {
-       throw new ApiException(400, "missing required params");
-    }
-    // create path and map variables
-    String path = "/user/createWithArray".replaceAll("\\{format\\}","json");
-
-    // query params
-    Map<String, String> queryParams = new HashMap<String, String>();
-    Map<String, String> headerParams = new HashMap<String, String>();
-    Map<String, String> formParams = new HashMap<String, String>();
-
-    String[] contentTypes = {
-      "application/json"};
-
-    String contentType = contentTypes.length > 0 ? contentTypes[0] : "application/json";
-
-    try {
-      String response = apiInvoker.invokeAPI(basePath, path, "POST", queryParams, body, headerParams, formParams, contentType);
-      if(response != null){
-        return ;
-      }
-      else {
-        return ;
-      }
-    } catch (ApiException ex) {
-      if(ex.getCode() == 404) {
-      	return ;
-      }
-      else {
-        throw ex;
-      }
-    }
-  }
-  public void createUsersWithListInput (List<User> body) throws ApiException {
-    // verify required params are set
-    if(body == null ) {
-       throw new ApiException(400, "missing required params");
-    }
-    // create path and map variables
-    String path = "/user/createWithList".replaceAll("\\{format\\}","json");
-
-    // query params
-    Map<String, String> queryParams = new HashMap<String, String>();
-    Map<String, String> headerParams = new HashMap<String, String>();
-    Map<String, String> formParams = new HashMap<String, String>();
-
-    String[] contentTypes = {
-      "application/json"};
-
-    String contentType = contentTypes.length > 0 ? contentTypes[0] : "application/json";
-
-    try {
-      String response = apiInvoker.invokeAPI(basePath, path, "POST", queryParams, body, headerParams, formParams, contentType);
-      if(response != null){
-        return ;
-      }
-      else {
-        return ;
-      }
-    } catch (ApiException ex) {
-      if(ex.getCode() == 404) {
-      	return ;
-      }
-      else {
-        throw ex;
-      }
-    }
-  }
+  //error info- code: 400 reason: "Invalid username supplied" model: <none>
+  //error info- code: 404 reason: "User not found" model: <none>
   public void updateUser (String username, User body) throws ApiException {
+    Object postBody = body;
     // verify required params are set
     if(username == null || body == null ) {
        throw new ApiException(400, "missing required params");
@@ -144,8 +48,17 @@ public class UserApi {
 
     String contentType = contentTypes.length > 0 ? contentTypes[0] : "application/json";
 
+    if(contentType.startsWith("multipart/form-data")) {
+      boolean hasFields = false;
+      FormDataMultiPart mp = new FormDataMultiPart();
+      if(hasFields)
+        postBody = mp;
+    }
+    else {
+      }
+
     try {
-      String response = apiInvoker.invokeAPI(basePath, path, "PUT", queryParams, body, headerParams, formParams, contentType);
+      String response = apiInvoker.invokeAPI(basePath, path, "PUT", queryParams, postBody, headerParams, formParams, contentType);
       if(response != null){
         return ;
       }
@@ -161,7 +74,10 @@ public class UserApi {
       }
     }
   }
+  //error info- code: 400 reason: "Invalid username supplied" model: <none>
+  //error info- code: 404 reason: "User not found" model: <none>
   public void deleteUser (String username) throws ApiException {
+    Object postBody = null;
     // verify required params are set
     if(username == null ) {
        throw new ApiException(400, "missing required params");
@@ -179,8 +95,17 @@ public class UserApi {
 
     String contentType = contentTypes.length > 0 ? contentTypes[0] : "application/json";
 
+    if(contentType.startsWith("multipart/form-data")) {
+      boolean hasFields = false;
+      FormDataMultiPart mp = new FormDataMultiPart();
+      if(hasFields)
+        postBody = mp;
+    }
+    else {
+      }
+
     try {
-      String response = apiInvoker.invokeAPI(basePath, path, "DELETE", queryParams, null, headerParams, formParams, contentType);
+      String response = apiInvoker.invokeAPI(basePath, path, "DELETE", queryParams, postBody, headerParams, formParams, contentType);
       if(response != null){
         return ;
       }
@@ -196,7 +121,10 @@ public class UserApi {
       }
     }
   }
+  //error info- code: 400 reason: "Invalid username supplied" model: <none>
+  //error info- code: 404 reason: "User not found" model: <none>
   public User getUserByName (String username) throws ApiException {
+    Object postBody = null;
     // verify required params are set
     if(username == null ) {
        throw new ApiException(400, "missing required params");
@@ -214,8 +142,17 @@ public class UserApi {
 
     String contentType = contentTypes.length > 0 ? contentTypes[0] : "application/json";
 
+    if(contentType.startsWith("multipart/form-data")) {
+      boolean hasFields = false;
+      FormDataMultiPart mp = new FormDataMultiPart();
+      if(hasFields)
+        postBody = mp;
+    }
+    else {
+      }
+
     try {
-      String response = apiInvoker.invokeAPI(basePath, path, "GET", queryParams, null, headerParams, formParams, contentType);
+      String response = apiInvoker.invokeAPI(basePath, path, "GET", queryParams, postBody, headerParams, formParams, contentType);
       if(response != null){
         return (User) ApiInvoker.deserialize(response, "", User.class);
       }
@@ -231,7 +168,9 @@ public class UserApi {
       }
     }
   }
+  //error info- code: 400 reason: "Invalid username and password combination" model: <none>
   public String loginUser (String username, String password) throws ApiException {
+    Object postBody = null;
     // verify required params are set
     if(username == null || password == null ) {
        throw new ApiException(400, "missing required params");
@@ -253,8 +192,17 @@ public class UserApi {
 
     String contentType = contentTypes.length > 0 ? contentTypes[0] : "application/json";
 
+    if(contentType.startsWith("multipart/form-data")) {
+      boolean hasFields = false;
+      FormDataMultiPart mp = new FormDataMultiPart();
+      if(hasFields)
+        postBody = mp;
+    }
+    else {
+      }
+
     try {
-      String response = apiInvoker.invokeAPI(basePath, path, "GET", queryParams, null, headerParams, formParams, contentType);
+      String response = apiInvoker.invokeAPI(basePath, path, "GET", queryParams, postBody, headerParams, formParams, contentType);
       if(response != null){
         return (String) ApiInvoker.deserialize(response, "", String.class);
       }
@@ -271,6 +219,7 @@ public class UserApi {
     }
   }
   public void logoutUser () throws ApiException {
+    Object postBody = null;
     // create path and map variables
     String path = "/user/logout".replaceAll("\\{format\\}","json");
 
@@ -284,8 +233,152 @@ public class UserApi {
 
     String contentType = contentTypes.length > 0 ? contentTypes[0] : "application/json";
 
+    if(contentType.startsWith("multipart/form-data")) {
+      boolean hasFields = false;
+      FormDataMultiPart mp = new FormDataMultiPart();
+      if(hasFields)
+        postBody = mp;
+    }
+    else {
+      }
+
     try {
-      String response = apiInvoker.invokeAPI(basePath, path, "GET", queryParams, null, headerParams, formParams, contentType);
+      String response = apiInvoker.invokeAPI(basePath, path, "GET", queryParams, postBody, headerParams, formParams, contentType);
+      if(response != null){
+        return ;
+      }
+      else {
+        return ;
+      }
+    } catch (ApiException ex) {
+      if(ex.getCode() == 404) {
+      	return ;
+      }
+      else {
+        throw ex;
+      }
+    }
+  }
+  public void createUsersWithArrayInput (List<User> body) throws ApiException {
+    Object postBody = body;
+    // verify required params are set
+    if(body == null ) {
+       throw new ApiException(400, "missing required params");
+    }
+    // create path and map variables
+    String path = "/user/createWithArray".replaceAll("\\{format\\}","json");
+
+    // query params
+    Map<String, String> queryParams = new HashMap<String, String>();
+    Map<String, String> headerParams = new HashMap<String, String>();
+    Map<String, String> formParams = new HashMap<String, String>();
+
+    String[] contentTypes = {
+      "application/json"};
+
+    String contentType = contentTypes.length > 0 ? contentTypes[0] : "application/json";
+
+    if(contentType.startsWith("multipart/form-data")) {
+      boolean hasFields = false;
+      FormDataMultiPart mp = new FormDataMultiPart();
+      if(hasFields)
+        postBody = mp;
+    }
+    else {
+      }
+
+    try {
+      String response = apiInvoker.invokeAPI(basePath, path, "POST", queryParams, postBody, headerParams, formParams, contentType);
+      if(response != null){
+        return ;
+      }
+      else {
+        return ;
+      }
+    } catch (ApiException ex) {
+      if(ex.getCode() == 404) {
+      	return ;
+      }
+      else {
+        throw ex;
+      }
+    }
+  }
+  public void createUsersWithListInput (List<User> body) throws ApiException {
+    Object postBody = body;
+    // verify required params are set
+    if(body == null ) {
+       throw new ApiException(400, "missing required params");
+    }
+    // create path and map variables
+    String path = "/user/createWithList".replaceAll("\\{format\\}","json");
+
+    // query params
+    Map<String, String> queryParams = new HashMap<String, String>();
+    Map<String, String> headerParams = new HashMap<String, String>();
+    Map<String, String> formParams = new HashMap<String, String>();
+
+    String[] contentTypes = {
+      "application/json"};
+
+    String contentType = contentTypes.length > 0 ? contentTypes[0] : "application/json";
+
+    if(contentType.startsWith("multipart/form-data")) {
+      boolean hasFields = false;
+      FormDataMultiPart mp = new FormDataMultiPart();
+      if(hasFields)
+        postBody = mp;
+    }
+    else {
+      }
+
+    try {
+      String response = apiInvoker.invokeAPI(basePath, path, "POST", queryParams, postBody, headerParams, formParams, contentType);
+      if(response != null){
+        return ;
+      }
+      else {
+        return ;
+      }
+    } catch (ApiException ex) {
+      if(ex.getCode() == 404) {
+      	return ;
+      }
+      else {
+        throw ex;
+      }
+    }
+  }
+  public void createUser (User body) throws ApiException {
+    Object postBody = body;
+    // verify required params are set
+    if(body == null ) {
+       throw new ApiException(400, "missing required params");
+    }
+    // create path and map variables
+    String path = "/user".replaceAll("\\{format\\}","json");
+
+    // query params
+    Map<String, String> queryParams = new HashMap<String, String>();
+    Map<String, String> headerParams = new HashMap<String, String>();
+    Map<String, String> formParams = new HashMap<String, String>();
+
+    String[] contentTypes = {
+      "application/json"};
+
+    String contentType = contentTypes.length > 0 ? contentTypes[0] : "application/json";
+
+    if(contentType.startsWith("multipart/form-data")) {
+      boolean hasFields = false;
+      FormDataMultiPart mp = new FormDataMultiPart();
+      if(hasFields)
+        postBody = mp;
+    }
+    else {
+      }
+
+    try {
+      String response = apiInvoker.invokeAPI(basePath, path, "POST", queryParams, postBody, headerParams, formParams, contentType);
       if(response != null){
         return ;
       }

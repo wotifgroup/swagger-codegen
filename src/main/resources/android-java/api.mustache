@@ -6,6 +6,7 @@ import {{invokerPackage}}.ApiInvoker;
 {{/imports}}
 
 import java.util.*;
+import java.io.File;
 
 {{#operations}}
 public class {{classname}} {
@@ -29,6 +30,10 @@ public class {{classname}} {
   }
 
   {{#operation}}
+  {{#errorList}} //error info- code: {{code}} reason: "{{reason}}" model: {{#responseModel}}{{responseModel}}
+  {{/responseModel}}{{^responseModel}}<none>
+  {{/responseModel}}
+  {{/errorList}}
   public {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}void {{/returnType}} {{nickname}} ({{#allParams}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) throws ApiException {
     {{#requiredParamCount}}
     // verify required params are set
