@@ -10,11 +10,14 @@ package {{package}};
 import {{import}};
 {{/imports}}
 
-import com.fasterxml.jackson.annotation.*;
-import org.apache.commons.lang.NullArgumentException;
-
 {{#models}}
 {{#model}}
+
+{{#hasRequiredParams}}
+import com.fasterxml.jackson.annotation.*;
+import org.apache.commons.lang.NullArgumentException;
+{{/hasRequiredParams}}
+
 public class {{classname}} {
   {{#vars}}
 

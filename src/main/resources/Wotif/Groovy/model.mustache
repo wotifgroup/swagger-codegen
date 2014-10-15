@@ -6,14 +6,17 @@
 
 package {{package}}
 
-import groovy.transform.Canonical
-
 {{#imports}}
 import {{import}}
 {{/imports}}
 
 {{#models}}
 {{#model}}
+
+{{#hasRequiredParams}}
+import com.fasterxml.jackson.annotation.*;
+{{/hasRequiredParams}}
+import groovy.transform.Canonical
 
 @Canonical
 class {{classname}} {
