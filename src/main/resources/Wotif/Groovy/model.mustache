@@ -1,20 +1,46 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// This file was generated using Swagger Codegen, specialised for Wotif.com
+//
+////////////////////////////////////////////////////////////////////////////////
+
 package {{package}}
 
 import groovy.transform.Canonical
-{{#imports}}import {{import}}
+
+{{#imports}}
+import {{import}}
 {{/imports}}
+
 {{#models}}
 {{#model}}
+
 @Canonical
 class {{classname}} {
+
   {{#vars}}
 
   {{#description}}/* {{{description}}} */
   {{/description}}
-  {{{datatype}}} {{name}} = {{{defaultValue}}}
-  {{/vars}}
   
+  {{{datatype}}} {{name}} {{^required}} = {{{defaultValue}}} 
+  {{/required}}
 
+  {{/vars}}
+
+{{#hasRequiredParams}}
+  /*
+   * Constructor for Jackson
+   */
+  @JsonCreator
+  {{classname}}({{#vars}}{{#required}}@JsonProperty(value="{{name}}", required = true) {{{datatype}}} {{name}}{{#hasMore}}, {{/hasMore}}{{/required}}{{/vars}}) {
+    {{#vars}}
+    {{#required}}
+    {{setter}}({{name}});
+    {{/required}}
+    {{/vars}}
+  }
+  {{/hasRequiredParams}}
 }
 
 {{/model}}

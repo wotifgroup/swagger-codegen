@@ -1,0 +1,24 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// This file was generated using Swagger Codegen, specialised for Wotif.com
+//
+////////////////////////////////////////////////////////////////////////////////
+
+package {{invokerPackage}}
+
+import groovy.transform.Canonical
+
+@Canonical
+class ApiException extends Exception {
+
+  private static final long serialVersionUID = 1L
+  private int code = 0
+  private String message = null
+
+  ApiException() {}
+
+  ApiException(int code, String message) {
+    this.code = code
+    this.message = message
+  }
+}

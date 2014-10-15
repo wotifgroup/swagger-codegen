@@ -6,10 +6,10 @@
 
 ## Example Usage:
 
-./bin/runscala.sh com.wotif.swagger.codegen.WotifJavaGenerator http://localhost:23180/service/api-docs/platform/web blah greenedge
+./bin/runscala.sh com.wotif.swagger.codegen.WotifGroovyGenerator http://localhost:23180/service/api-docs/platform/web nokey greenedge
 
 ## October 2014
 
 Updated to Version 2.0.17 (https://github.com/wordnik/swagger-codegen/tree/2.0.17)
 
-###Note: the updated code generator requires Scala 2.11 (previously was 2.10)
+### Note: the updated code generator requires Scala 2.11 (previously was 2.10)

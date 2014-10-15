@@ -34,6 +34,6 @@ object WotifGroovyGenerator extends WotifJavaGenerator {
   override def supportingFiles =
     List(
       ("postBodyEncoder.mustache", destinationDir + java.io.File.separator + invokerPackage.get.replace(".", java.io.File.separator) + java.io.File.separator, "PostBodyEncoder.groovy"),
+      ("apiException.mustache", destinationDir + java.io.File.separator + invokerPackage.get.replace(".", java.io.File.separator) + java.io.File.separator, "ApiException.groovy"),
       ("build.gradle.mustache", "generated-code/groovy", "build.gradle"))
-
 }

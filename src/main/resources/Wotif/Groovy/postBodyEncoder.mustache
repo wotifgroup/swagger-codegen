@@ -19,18 +19,18 @@ import java.util.LinkedHashMap
 /**
  * PostBodyEncoder will encode the content of the body parameter of a posted request.
  */
-public class PostBodyEncoder implements Encoder {
+class PostBodyEncoder implements Encoder {
 
     private final ObjectMapper mapper
 
-    public PostBodyEncoder() {
+    PostBodyEncoder() {
         mapper = new ObjectMapper()
                  .setSerializationInclusion(JsonInclude.Include.NON_NULL)
                  .configure(SerializationFeature.INDENT_OUTPUT, true)
     }
 
     @Override
-    public void encode(Object object, RequestTemplate template) throws EncodeException {
+    void encode(Object object, RequestTemplate template) throws EncodeException {
         try {
             Object body = ((LinkedHashMap)object).get("body")
             if(!body) {

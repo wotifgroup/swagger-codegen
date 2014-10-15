@@ -193,7 +193,9 @@ class Codegen(config: CodegenConfig) {
     })
     requiredParams.size match {
       case 0 =>
-      case _ => requiredParams.last.asInstanceOf[HashMap[String, String]] -= "hasMore"
+      case _ => {
+        requiredParams.last.asInstanceOf[HashMap[String, String]] -= "hasMore"
+      }
     }
 
     headerParams.size match {
@@ -394,7 +396,10 @@ class Codegen(config: CodegenConfig) {
           "description" -> propertyDocSchema.description,
           "notes" -> propertyDocSchema.description,
           "allowableValues" -> rawAllowableValuesToString(propertyDocSchema.allowableValues),
-          (if(propertyDocSchema.required) "required" else "isNotRequired") -> "true",
+          (if(propertyDocSchema.required) {
+            data += "hasRequiredParams" -> "true"
+            "required"
+            } else "isNotRequired") -> "true", 
           "getter" -> config.toGetter(prop._1, config.toDeclaration(propertyDocSchema)._1),
           "setter" -> config.toSetter(prop._1, config.toDeclaration(propertyDocSchema)._1),
           "isList" -> isList,

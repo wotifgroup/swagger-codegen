@@ -6,6 +6,7 @@
 
 package {{package}}
 
+import {{invokerPackage}}.ApiException;
 import {{invokerPackage}}.PostBodyEncoder
 import feign.*
 import feign.RequestLine
@@ -14,7 +15,8 @@ import feign.codec.Encoder
 import feign.jackson.JacksonDecoder
 import javax.inject.Named
 
-{{#imports}}import {{import}}
+{{#imports}}
+import {{import}}
 {{/imports}}
 
 {{#operations}}
@@ -40,7 +42,7 @@ interface {{classname}}Proxy {
  */
 class {{classname}} {
 
-  String basePath
+  private String basePath
   private {{classname}}Proxy feignProxy
   private Encoder encoder
   private Decoder decoder
@@ -48,41 +50,33 @@ class {{classname}} {
   /**
    * Sets the base URL path for the service
    * @param basePath
+   * @param requestInterceptor - interceptor to adjust headers
    */
- {{className}} setBasePath(String basePath) {
-    if(basePath == null) {
-        throw new IllegalArgumentException("Base Path is null! Base Path for Service must be set before using client.");
-    }
+ {{className}} setBasePath(String basePath, RequestInterceptor requestInterceptor) {
     this.basePath = basePath
     this.decoder = new JacksonDecoder()
     this.encoder = new PostBodyEncoder()
-    feignProxy = Feign.builder()
-                     .encoder(encoder)
-                     .decoder(decoder)
-                     .target({{classname}}Proxy.class, basePath)
-    return this
+    Feign.Builder builder = Feign.builder().encoder(encoder).decoder(decoder)
+    if (requestInterceptor != null) {
+      builder.requestInterceptor(requestInterceptor)
+    }
+    feignProxy = builder.target({{classname}}Proxy.class, basePath)
+    this
   }
 
   {{#operation}}
-  def {{nickname}} ({{#allParams}}{{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}}) {
+  {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}Response {{/returnType}} {{{nickname}}} ({{#allParams}}{{{dataType}}} {{{paramName}}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
+  {{#requiredParamCount}}
+  throws ApiException
+  {{/requiredParamCount}}
+  {
     {{#requiredParamCount}}
     // verify required params are set
-    if({{/requiredParamCount}}{{#requiredParams}} {{paramName}} == null {{#hasMore}}|| {{/hasMore}}{{/requiredParams}}{{#requiredParamCount}}) {
-       "Missing required params"
+    if({{#requiredParams}} !{{{paramName}}}{{#hasMore}} || {{/hasMore}}{{/requiredParams}}) {
+       throw new ApiException(400, "missing required params")
     }
     {{/requiredParamCount}}
-    Response response = feignProxy.{{nickname}}({{#allParams}}{{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
-    {{#errorList}}
-    if(response.status() == {{code}}) {
-      return "{{reason}} - " + response.body().toString()
-    }
-    {{/errorList}}
-    {{#returnType}}
-    return {{returnType}}.class.newInstance(response)
-    {{/returnType}}
-    {{^returnType}}
-    return response
-    {{/returnType}}
+    feignProxy.{{{nickname}}}({{#allParams}}{{{paramName}}}{{#hasMore}}, {{/hasMore}}{{/allParams}})
   }
 
   {{/operation}}
