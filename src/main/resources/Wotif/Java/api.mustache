@@ -34,7 +34,7 @@ interface {{{classname}}}Proxy {
   @Headers("Content-Type: {{{mediaType}}};charset=UTF-8")
   {{/consumes}}
   {{/post}}
-  {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}Response {{/returnType}} {{nickname}}({{#allParams}}@Named("{{{paramName}}}") {{dataType}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
+  {{#returnType}}{{{returnType}}} {{/returnType}}{{^returnType}}Response {{/returnType}} {{nickname}}({{#allParams}}@Named("{{{paramName}}}") {{{dataType}}} {{paramName}}{{#hasMore}}, {{/hasMore}}{{/allParams}});
   
   {{/operation}}
 }
