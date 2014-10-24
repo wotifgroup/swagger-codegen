@@ -6,32 +6,23 @@
 
 package {{invokerPackage}};
 
-public class ApiException extends Exception {
+public class ApiException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
-  private int code = 0;
-  private String message = null;
+  private ErrorWrapper error;
 
   public ApiException() {}
 
-  public ApiException(int code, String message) {
-    this.code = code;
-    this.message = message;
+  public ApiException(ErrorWrapper error) {
+    this.error = error;
   }
 
-  public int getCode() {
-    return code;
+  public ErrorWrapper getError() {
+    return error;
   }
 
-  public void setCode(int code) {
-    this.code = code;
+  public void setError(ErrorWrapper error) {
+    this.error = error;
   }
-
-  public String getMessage() {
-    return message;
-  }
-
-  public void setMessage(String message) {
-    this.message = message;
-  }
+  
 }

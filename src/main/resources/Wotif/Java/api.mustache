@@ -7,15 +7,22 @@
 package {{package}};
 
 import {{invokerPackage}}.ApiException;
+import {{invokerPackage}}.ErrorWrapper;
+import {{invokerPackage}}.MissingRequiredParameterError;
 import {{invokerPackage}}.PostBodyEncoder;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.StringWriter;
+import java.util.*;
+import org.apache.commons.io.IOUtils;
 import feign.*;
 import feign.RequestLine;
 import feign.codec.Decoder;
 import feign.codec.Encoder;
+import feign.codec.ErrorDecoder;
 import feign.jackson.JacksonDecoder;
 import javax.inject.Named;
 
-import java.util.*;
 {{#imports}}import {{import}};
 {{/imports}}
 {{#operations}}
@@ -48,6 +55,30 @@ public class {{{classname}}} {
   private {{{classname}}}Proxy feignProxy;
   private Encoder encoder;
   private Decoder decoder;
+  private ApiErrorDecoder errorDecoder;
+
+  public class ApiErrorDecoder implements ErrorDecoder {
+      @Override
+      public Exception decode(String methodKey, Response response) {
+          try {
+              StringWriter sw = new StringWriter();
+              IOUtils.copy(response.body().asInputStream(), sw, "UTF-8");
+              String body = sw.toString();
+              ObjectMapper mapper = new ObjectMapper();
+              JsonNode errorDetails = mapper.readTree(body);
+
+              String errorClassName = "{{{modelPackage}}}." + errorDetails.get("errorClass").asText();
+              Class errorClass = Class.forName(errorClassName);
+              Object error = mapper.readValue(errorDetails.get("data").asText(), errorClass);
+              ErrorWrapper wrapper = new ErrorWrapper(error);
+
+              return new ApiException(wrapper);
+          } catch (Exception e) {
+              ErrorDecoder defaultDecoder = new ErrorDecoder.Default();
+              return defaultDecoder.decode(methodKey, response);
+          }
+      }
+  }
 
   //private constructor to ensure {{classname}} can't be instantiated without basePath
   @SuppressWarnings("unused")
@@ -88,11 +119,15 @@ public class {{{classname}}} {
     this.basePath = basePath;
     this.decoder = new JacksonDecoder();
     this.encoder = new PostBodyEncoder();
+    this.errorDecoder = new ApiErrorDecoder();
     Feign.Builder builder = Feign.builder().encoder(encoder).decoder(decoder);
     if (requestInterceptor != null) {
       builder.requestInterceptor(requestInterceptor);
     }
-    feignProxy = builder.target({{classname}}Proxy.class, basePath);
+    feignProxy = builder
+      .options(new Request.Options(10 * 1000, Integer.MAX_VALUE))
+      .errorDecoder(errorDecoder)
+      .target({{classname}}Proxy.class, basePath);
     return this;
   }
   
@@ -113,7 +148,7 @@ public class {{{classname}}} {
     {{#requiredParamCount}}
     // verify required params are set
     if({{#requiredParams}} {{{paramName}}} == null{{#hasMore}} || {{/hasMore}}{{/requiredParams}}) {
-       throw new ApiException(400, "missing required params");
+       throw new ApiException(new ErrorWrapper(new MissingRequiredParameterError("{{#requiredParams}}{{{paramName}}}{{#hasMore}}, {{/hasMore}}{{/requiredParams}}")));
     }
     {{/requiredParamCount}}
     return feignProxy.{{{nickname}}}({{#allParams}}{{{paramName}}}{{#hasMore}}, {{/hasMore}}{{/allParams}});

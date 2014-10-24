@@ -1,0 +1,19 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// This file was generated using Swagger Codegen, specialised for Wotif.com
+//
+////////////////////////////////////////////////////////////////////////////////
+
+package {{invokerPackage}};
+
+public class ErrorWrapper {
+    private Object error;
+
+	public ErrorWrapper(Object error) {
+		this.error = error;
+	}    
+
+    public <T> T get() {
+        return (T) error;
+    }
+}

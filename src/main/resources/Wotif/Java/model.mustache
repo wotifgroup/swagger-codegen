@@ -19,25 +19,29 @@ import org.apache.commons.lang.NullArgumentException;
 {{/hasRequiredParams}}
 
 public class {{classname}} {
-  {{#vars}}
-
-  {{#description}}/* {{{description}}} */
-  {{/description}}
-  private {{{datatype}}} {{name}}{{^required}} = {{{defaultValue}}}{{/required}};
+  {{#vars}}  
 
   {{#allowableValues}}{{#min}} // range from {{min}} to {{max}}
   {{/min}}
-  //{{^min}}public enum {{name}}Enum { {{#values}} {{.}}, {{/values}} };
+  {{^min}}public enum {{name}}Enum { {{#values}} {{.}}{{#hasMore}},{{/hasMore}} {{/values}} }
   {{/min}}
+  {{#description}}/* {{{description}}} */
+  {{/description}}
+  private {{name}}Enum {{name}}{{^required}} = {{{defaultValue}}}{{/required}};
+  {{/allowableValues}}
+  {{^allowableValues}}
+  {{#description}}/* {{{description}}} */
+  {{/description}}
+  private {{{datatype}}} {{name}}{{^required}} = {{{defaultValue}}}{{/required}};
   {{/allowableValues}}
   {{/vars}}
   {{#vars}}
 
-  public {{{datatype}}} {{getter}}() {
+  public {{> dataType}} {{getter}}() {
     return {{name}};
   }
 
-  public {{classname}} {{setter}}({{{datatype}}} {{name}}) {
+  public {{classname}} {{setter}}({{> dataType}} {{{name}}}) {
     {{#required}}
     if({{name}} == null) {
       throw new NullArgumentException("{{name}}");
@@ -53,11 +57,9 @@ public class {{classname}} {
 {{#hasRequiredParams}}
 
   @JsonCreator  
-  public {{classname}}({{#vars}}{{#required}}@JsonProperty(value="{{name}}", required = true) {{{datatype}}} {{name}}{{#hasMore}}, {{/hasMore}}{{/required}}{{/vars}}) {
-    {{#vars}}
-    {{#required}}
-    {{setter}}({{name}});
-    {{/required}}
+  public {{classname}}({{#vars}}@JsonProperty(value="{{name}}"{{#required}}, required = true{{/required}}) {{> dataType}} {{name}}{{#hasMore}}, {{/hasMore}}{{/vars}}) {
+    {{#vars}}    
+    {{setter}}({{name}});    
     {{/vars}}
   }
 

@@ -168,6 +168,8 @@ class WotifJavaGenerator extends BasicJavaGenerator {
     List(
       ("postBodyEncoder.mustache", destinationDir + java.io.File.separator + invokerPackage.get.replace(".", java.io.File.separator) + java.io.File.separator, "PostBodyEncoder.java"),
       ("apiException.mustache", destinationDir + java.io.File.separator + invokerPackage.get.replace(".", java.io.File.separator) + java.io.File.separator, "ApiException.java"),
+      ("errorWrapper.mustache", destinationDir + java.io.File.separator + invokerPackage.get.replace(".", java.io.File.separator) + java.io.File.separator, "ErrorWrapper.java"),
+      ("missingRequiredParameter.mustache", destinationDir + java.io.File.separator + invokerPackage.get.replace(".", java.io.File.separator) + java.io.File.separator, "MissingRequiredParameterError.java"),
       ("pom.mustache", "generated-code/java", "pom.xml"))
       
 }
