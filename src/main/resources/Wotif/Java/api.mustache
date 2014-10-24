@@ -124,8 +124,7 @@ public class {{{classname}}} {
     if (requestInterceptor != null) {
       builder.requestInterceptor(requestInterceptor);
     }
-    feignProxy = builder
-      .options(new Request.Options(10 * 1000, Integer.MAX_VALUE))
+    feignProxy = builder      
       .errorDecoder(errorDecoder)
       .target({{classname}}Proxy.class, basePath);
     return this;
