@@ -5,7 +5,7 @@ organization := "com.wordnik"
 
 name := "swagger-codegen"
 
-version := "2.0.17"
+version := "2.0.18-SNAPSHOT"
 
 crossVersion := CrossVersion.full
 
@@ -15,12 +15,13 @@ scalacOptions ++= Seq("-optimize", "-unchecked", "-deprecation", "-Xcheckinit", 
 
 crossScalaVersions := Seq("2.10.0", "2.10.1", "2.10.2", "2.10.3", "2.10.4", "2.11.0", "2.11.1")
 
-scalaVersion := "2.11.1"
+scalaVersion := "2.10.4"
 
 libraryDependencies ++= Seq(
   "org.json4s"                  %% "json4s-jackson"     % "3.2.10",
   "io.backchat.inflector"       %% "scala-inflector"    % "1.3.5",
   "commons-io"                   % "commons-io"         % "2.3",
+  "net.iharder"                  % "base64"             % "2.3.8",
   "ch.qos.logback"               % "logback-classic"    % "1.0.13" % "provided",
   "org.rogach"                  %% "scallop"            % "0.9.5",
   "junit"                        % "junit"              % "4.11" % "test",
@@ -133,4 +134,4 @@ pomExtra <<= (pomExtra, name, description) {(pom, name, desc) => pom ++ Group(
 
 assemblySettings
 
-jarName in assembly := "swagger-codegen.jar"
+// jarName in assembly := "swagger-codegen.jar"

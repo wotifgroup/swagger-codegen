@@ -23,9 +23,11 @@ object SwaggerSerializers {
     ("integer", "int64") -> "long",
     ("number", "float") -> "float",
     ("number", "double") -> "double",
+    ("number", null) -> "BigDecimal",
     ("string", "byte") -> "byte",
     ("string", "date") -> "Date",
     ("string", "date-time") -> "Date",
+    ("string", "uuid") -> "UUID",
 
     // containers
     ("array", "") -> "Array",

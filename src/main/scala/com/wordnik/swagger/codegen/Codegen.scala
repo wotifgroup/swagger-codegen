@@ -193,9 +193,7 @@ class Codegen(config: CodegenConfig) {
     })
     requiredParams.size match {
       case 0 =>
-      case _ => {
-        requiredParams.last.asInstanceOf[HashMap[String, String]] -= "hasMore"
-      }
+      case _ => requiredParams.last.asInstanceOf[HashMap[String, String]] -= "hasMore"
     }
 
     headerParams.size match {
@@ -205,10 +203,7 @@ class Codegen(config: CodegenConfig) {
 
     queryParams.size match {
       case 0 =>
-      case _ => {
-        queryParams.head.asInstanceOf[HashMap[String, String]] += "first" -> "true"
-        queryParams.last.asInstanceOf[HashMap[String, String]] -= "hasMore"
-      }
+      case _ => queryParams.last.asInstanceOf[HashMap[String, String]] -= "hasMore"
     }
 
     pathParams.size match {
@@ -346,7 +341,7 @@ class Codegen(config: CodegenConfig) {
 
       var baseType = dt
       // import the object inside the container
-      if (propertyDocSchema.items != null) {
+      if (propertyDocSchema.items != null && !config.typeMapping.contains(dt)) {
         // import the container
         imports += Map("import" -> dt)
         propertyDocSchema.items match {
@@ -396,10 +391,7 @@ class Codegen(config: CodegenConfig) {
           "description" -> propertyDocSchema.description,
           "notes" -> propertyDocSchema.description,
           "allowableValues" -> rawAllowableValuesToString(propertyDocSchema.allowableValues),
-          (if(propertyDocSchema.required) {
-            data += "hasRequiredParams" -> "true"
-            "required"
-            } else "isNotRequired") -> "true", 
+          (if(propertyDocSchema.required) "required" else "isNotRequired") -> "true",
           "getter" -> config.toGetter(prop._1, config.toDeclaration(propertyDocSchema)._1),
           "setter" -> config.toSetter(prop._1, config.toDeclaration(propertyDocSchema)._1),
           "isList" -> isList,
