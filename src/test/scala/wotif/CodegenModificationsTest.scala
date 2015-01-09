@@ -48,6 +48,9 @@ class CodegenModificationsTest extends FlatSpec with ShouldMatchers {
 
   /*
    * Field first on the query param should be true
+   *
+   * If not, add queryParams.head.asInstanceOf[HashMap[String, String]] += "first" -> "true" around line 207
+   * in the wildcard case for queryParams.size (above queryParams.last.asInstanceOf[HashMap[String, String]] -= "hasMore")
    */
   it should "have a first field on first query param and should be true" in {
     val map = subject.apiToMap("/contacts", testOp)
@@ -56,6 +59,14 @@ class CodegenModificationsTest extends FlatSpec with ShouldMatchers {
 
   /*
    * Field hasRequiredParams should be true
+   *
+   * If not, around line 397 change:
+   * (if(propertyDocSchema.required) "required" else "isNotRequired") -> "true",
+   * to:
+   * (if(propertyDocSchema.required) {
+   *        data += "hasRequiredParams" -> "true"
+   *       "required"
+   *  } else "isNotRequired") -> "true",
    */
   it should "have a hasRequiredParams field and should be true" in {
     val map = subject.modelToMap("Contact", testModel)
