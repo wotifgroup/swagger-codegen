@@ -47,6 +47,7 @@ class WotifJavaGenerator extends BasicJavaGenerator {
     "Map<string,int>" -> "Map<String,Integer>",
     "Map<string,boolean>" -> "Map<String,Boolean>",
     "Map<string,Node>" -> "Map<String,Node>",
+    "Map<string,ValidationError>" -> "Map<String,ValidationError>",
     "List<Map<string,string>>" -> "List<Map<String,String>>")
 
   // import/require statements for specific datatypes
@@ -67,6 +68,7 @@ class WotifJavaGenerator extends BasicJavaGenerator {
     "Map[string,int]" -> "java.util.*",
     "List[Map[string,string]]" -> "java.util.*",
     "Map[string,Node]" -> "java.util.*",
+    "Map[string,ValidationError]" -> "java.util.*",
     //New mappings in base class for V2.0.17
     "Timestamp" -> "java.sql.Timestamp",
     "Set" -> "java.util.*"
